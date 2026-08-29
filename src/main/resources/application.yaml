@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: developpement_ERP
+  profiles:
+    active: local
