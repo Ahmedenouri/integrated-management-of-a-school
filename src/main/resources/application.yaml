@@ -1,5 +1,5 @@
 spring:
   application:
-    name: developpement_ERP
+    name: development_ERP
   profiles:
     active: local
