@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DirecteurRepository extends JpaRepository<Directeur, Long> {
-    //List<Directeur> findByDepartement(String departement);
 }

@@ -9,5 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface IUtilisateurMapper {
-    List<UtilisateurResponce> maptolistUtilisateur (List<Utilisateur> utilisateurs);
+    List<UtilisateurResponce> listToResponce(List<Utilisateur> utilisateurs);
+    UtilisateurResponce MapToResponce(Utilisateur utilisateur);
 }

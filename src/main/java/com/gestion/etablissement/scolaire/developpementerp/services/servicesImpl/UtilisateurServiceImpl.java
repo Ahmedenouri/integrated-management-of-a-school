@@ -1,6 +1,9 @@
 package com.gestion.etablissement.scolaire.developpementerp.services.servicesImpl;
 
+import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoRequests.UtilisateurRequest;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.UtilisateurResponce;
+import com.gestion.etablissement.scolaire.developpementerp.model.entities.Utilisateur;
+import com.gestion.etablissement.scolaire.developpementerp.model.exceptions.ResourceNotFoundException;
 import com.gestion.etablissement.scolaire.developpementerp.model.mappers.IUtilisateurMapper;
 import com.gestion.etablissement.scolaire.developpementerp.repositories.UtilisateurRepository;
 import com.gestion.etablissement.scolaire.developpementerp.services.IUtilisateurService;
@@ -18,8 +21,14 @@ public class UtilisateurServiceImpl implements IUtilisateurService {
 
 
     @Override
-    public List<UtilisateurResponce> getAllUtilisateurs() {
+    public List<UtilisateurResponce> getAllUsers() {
         log.debug("getAllUtilisateurs SERVICE");
-        return utilisateurMapper.maptolistUtilisateur(utilisateurRepository.findAll());
+        return utilisateurMapper.listToResponce(utilisateurRepository.findAll());
+    }
+
+    @Override
+    public UtilisateurResponce getUserById(Long iduser) {
+        return utilisateurMapper.MapToResponce(utilisateurRepository.findById(iduser)
+                .orElseThrow(()-> new ResourceNotFoundException("Utilisateur not found with id " + iduser)));
     }
 }
