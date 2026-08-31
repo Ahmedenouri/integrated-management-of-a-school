@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api-evaluation")
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class EvaluationController {
 
     private final IEvaluationService evaluationService;
@@ -33,6 +35,7 @@ public class EvaluationController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasAnyRole('PROFESSEUR', 'DIRECTEUR')")
     @PostMapping("/add-Evaluation")
     public ResponseEntity<EvaluationResponce> addEvaluation(@Valid @RequestBody EvaluationRequest request) {
         log.debug("add Evaluation: {}", request.getTitre());
@@ -71,6 +74,7 @@ public class EvaluationController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('PROFESSEUR', 'DIRECTEUR')")
     @PatchMapping("/update-Evaluation/{id}")
     public ResponseEntity<EvaluationResponce> updateEvaluation(@PathVariable("id") Long id,
                                                                @Valid @RequestBody EvaluationRequest request) {
@@ -83,6 +87,7 @@ public class EvaluationController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Evaluation/{id}")
     public ResponseEntity<Void> deleteEvaluation(@PathVariable("id") Long id) {
         log.debug("Delete Evaluation : {}", id);

@@ -10,6 +10,7 @@ import com.gestion.etablissement.scolaire.developpementerp.repositories.Surveill
 import com.gestion.etablissement.scolaire.developpementerp.services.ISurveillantService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,12 +23,16 @@ public class SurveillantServiceImpl implements ISurveillantService {
 
     private final ISurveillantMapper surveillantMapper;
     private final SurveillantRepository surveillantRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public SurveillantResponce addSurveillant(SurveillantRequest surveillantRequest) {
         log.debug("Adding surveillant with email: {}", surveillantRequest.getEmail());
 
         Surveillant surveillant = surveillantMapper.map(surveillantRequest);
+        if (surveillant.getMotDePasse() != null && !surveillant.getMotDePasse().startsWith("$2a$")) {
+            surveillant.setMotDePasse(passwordEncoder.encode(surveillant.getMotDePasse()));
+        }
         initializeDefaults(surveillant);
 
         Surveillant savedSurveillant = surveillantRepository.save(surveillant);
@@ -40,6 +45,9 @@ public class SurveillantServiceImpl implements ISurveillantService {
 
         Surveillant existingSurveillant = findSurveillantOrThrow(idSurveillant);
         surveillantMapper.updateFromRequest(surveillantRequest, existingSurveillant);
+        if (surveillantRequest.getMotDePasse() != null && !surveillantRequest.getMotDePasse().isEmpty() && !surveillantRequest.getMotDePasse().startsWith("$2a$")) {
+            existingSurveillant.setMotDePasse(passwordEncoder.encode(surveillantRequest.getMotDePasse()));
+        }
 
         Surveillant savedSurveillant = surveillantRepository.save(existingSurveillant);
         return surveillantMapper.map(savedSurveillant);

@@ -12,6 +12,7 @@ import com.gestion.etablissement.scolaire.developpementerp.repositories.Etudiant
 import com.gestion.etablissement.scolaire.developpementerp.services.IEtudiantService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,12 +26,16 @@ public class EtudiantServiceImpl implements IEtudiantService {
     private final IEtudiantMapper etudiantMapper;
     private final EtudiantRepository etudiantRepository;
     private final ClasseRepository classeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public EtudiantResponce addEtudiant(EtudiantRequest etudiantRequest) {
         log.debug("Adding etudiant with email: {}", etudiantRequest.getEmail());
 
         Etudiant etudiant = etudiantMapper.map(etudiantRequest);
+        if (etudiant.getMotDePasse() != null && !etudiant.getMotDePasse().startsWith("$2a$")) {
+            etudiant.setMotDePasse(passwordEncoder.encode(etudiant.getMotDePasse()));
+        }
         initializeDefaults(etudiant);
         assignClasse(etudiant, etudiantRequest.getClasseId());
 
@@ -44,6 +49,9 @@ public class EtudiantServiceImpl implements IEtudiantService {
 
         Etudiant existingEtudiant = findEtudiantOrThrow(idEtudiant);
         etudiantMapper.updateFromRequest(etudiantRequest, existingEtudiant);
+        if (etudiantRequest.getMotDePasse() != null && !etudiantRequest.getMotDePasse().isEmpty() && !etudiantRequest.getMotDePasse().startsWith("$2a$")) {
+            existingEtudiant.setMotDePasse(passwordEncoder.encode(etudiantRequest.getMotDePasse()));
+        }
 
         if (etudiantRequest.getClasseId() != null) {
             assignClasse(existingEtudiant, etudiantRequest.getClasseId());

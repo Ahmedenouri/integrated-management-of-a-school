@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api-user")
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("hasRole('DIRECTEUR')")
 public class UtilisateurController {
     private final IUtilisateurService utilisateurService;
 

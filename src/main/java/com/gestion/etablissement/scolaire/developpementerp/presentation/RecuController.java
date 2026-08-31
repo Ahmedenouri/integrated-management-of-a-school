@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api-recu")
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("hasAnyRole('RESPONSABLE_FINANCIER', 'DIRECTEUR', 'ETUDIANT')")
 public class RecuController {
 
     private final IRecuService recuService;
@@ -33,6 +35,7 @@ public class RecuController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasAnyRole('RESPONSABLE_FINANCIER', 'DIRECTEUR')")
     @PostMapping("/add-Recu")
     public ResponseEntity<RecuResponce> addRecu(@Valid @RequestBody RecuRequest request) {
         log.debug("add Recu: {}", request.getNumeroRecu());
@@ -71,6 +74,7 @@ public class RecuController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('RESPONSABLE_FINANCIER', 'DIRECTEUR')")
     @PatchMapping("/update-Recu/{id}")
     public ResponseEntity<RecuResponce> updateRecu(@PathVariable("id") Long id,
                                                    @Valid @RequestBody RecuRequest request) {
@@ -83,6 +87,7 @@ public class RecuController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Recu/{id}")
     public ResponseEntity<Void> deleteRecu(@PathVariable("id") Long id) {
         log.debug("Delete Recu : {}", id);

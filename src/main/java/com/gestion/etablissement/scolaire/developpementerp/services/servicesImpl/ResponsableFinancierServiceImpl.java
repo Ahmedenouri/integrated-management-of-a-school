@@ -10,6 +10,7 @@ import com.gestion.etablissement.scolaire.developpementerp.repositories.Responsa
 import com.gestion.etablissement.scolaire.developpementerp.services.IResponsableFinancierService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,12 +23,16 @@ public class ResponsableFinancierServiceImpl implements IResponsableFinancierSer
 
     private final IResponsableFinancierMapper responsableFinancierMapper;
     private final ResponsableFinancierRepository responsableFinancierRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ResponsableFinancierResponce addResponsableFinancier(ResponsableFinancierRequest responsableFinancierRequest) {
         log.debug("Adding responsable financier with email: {}", responsableFinancierRequest.getEmail());
 
         ResponsableFinancier responsableFinancier = responsableFinancierMapper.map(responsableFinancierRequest);
+        if (responsableFinancier.getMotDePasse() != null && !responsableFinancier.getMotDePasse().startsWith("$2a$")) {
+            responsableFinancier.setMotDePasse(passwordEncoder.encode(responsableFinancier.getMotDePasse()));
+        }
         if (responsableFinancier.getRole() == null) {
             responsableFinancier.setRole(Role.RESPONSABLE_FINANCIER);
         }
@@ -48,6 +53,9 @@ public class ResponsableFinancierServiceImpl implements IResponsableFinancierSer
 
         ResponsableFinancier existingResponsableFinancier = findResponsableFinancierOrThrow(idResponsableFinancier);
         responsableFinancierMapper.updateFromRequest(responsableFinancierRequest, existingResponsableFinancier);
+        if (responsableFinancierRequest.getMotDePasse() != null && !responsableFinancierRequest.getMotDePasse().isEmpty() && !responsableFinancierRequest.getMotDePasse().startsWith("$2a$")) {
+            existingResponsableFinancier.setMotDePasse(passwordEncoder.encode(responsableFinancierRequest.getMotDePasse()));
+        }
 
         ResponsableFinancier savedResponsableFinancier = responsableFinancierRepository.save(existingResponsableFinancier);
         return responsableFinancierMapper.map(savedResponsableFinancier);

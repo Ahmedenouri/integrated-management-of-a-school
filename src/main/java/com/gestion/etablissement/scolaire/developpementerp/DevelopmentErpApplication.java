@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class DevelopmentErpApplication {
 
     @Bean
     CommandLineRunner initDatabase(
+            PasswordEncoder passwordEncoder,
             DirecteurRepository directeurRepository,
             ResponsableFinancierRepository responsableFinancierRepository,
             SurveillantRepository surveillantRepository,
@@ -52,7 +54,7 @@ public class DevelopmentErpApplication {
             directeur.setNom("Ennouri");
             directeur.setPrenom("Ahmed");
             directeur.setEmail("ahmed.ennouri@school.ma");
-            directeur.setMotDePasse("pass123");
+            directeur.setMotDePasse(passwordEncoder.encode("pass123"));
             directeur.setTelephone("0600000001");
             directeur.setRole(Role.DIRECTEUR);
             directeur.setEstActif(true);
@@ -63,7 +65,7 @@ public class DevelopmentErpApplication {
             respFin.setNom("Bennani");
             respFin.setPrenom("Karim");
             respFin.setEmail("karim.bennani@school.ma");
-            respFin.setMotDePasse("pass123");
+            respFin.setMotDePasse(passwordEncoder.encode("pass123"));
             respFin.setTelephone("0600000002");
             respFin.setRole(Role.RESPONSABLE_FINANCIER);
             respFin.setEstActif(true);
@@ -74,7 +76,7 @@ public class DevelopmentErpApplication {
             surveillant.setNom("Tazi");
             surveillant.setPrenom("Rachid");
             surveillant.setEmail("rachid.tazi@school.ma");
-            surveillant.setMotDePasse("pass123");
+            surveillant.setMotDePasse(passwordEncoder.encode("pass123"));
             surveillant.setTelephone("0600000003");
             surveillant.setRole(Role.SURVEILLANT);
             surveillant.setEstActif(true);
@@ -85,7 +87,7 @@ public class DevelopmentErpApplication {
             profMath.setNom("Chraibi");
             profMath.setPrenom("Hassan");
             profMath.setEmail("hassan.chraibi@school.ma");
-            profMath.setMotDePasse("pass123");
+            profMath.setMotDePasse(passwordEncoder.encode("pass123"));
             profMath.setTelephone("0600000004");
             profMath.setRole(Role.PROFESSEUR);
             profMath.setSpecialite("Mathématiques");
@@ -96,7 +98,7 @@ public class DevelopmentErpApplication {
             profPhysique.setNom("El Fassi");
             profPhysique.setPrenom("Sanaa");
             profPhysique.setEmail("sanaa.elfassi@school.ma");
-            profPhysique.setMotDePasse("pass123");
+            profPhysique.setMotDePasse(passwordEncoder.encode("pass123"));
             profPhysique.setTelephone("0600000005");
             profPhysique.setRole(Role.PROFESSEUR);
             profPhysique.setSpecialite("Physique-Chimie");
@@ -139,7 +141,7 @@ public class DevelopmentErpApplication {
             etudiant1.setNom("Alami");
             etudiant1.setPrenom("Youssef");
             etudiant1.setEmail("youssef.alami@student.ma");
-            etudiant1.setMotDePasse("pass123");
+            etudiant1.setMotDePasse(passwordEncoder.encode("pass123"));
             etudiant1.setTelephone("0611111111");
             etudiant1.setRole(Role.ETUDIANT);
             etudiant1.setEstActif(true);
@@ -155,7 +157,7 @@ public class DevelopmentErpApplication {
             etudiant2.setNom("Badr");
             etudiant2.setPrenom("Salma");
             etudiant2.setEmail("salma.badr@student.ma");
-            etudiant2.setMotDePasse("pass123");
+            etudiant2.setMotDePasse(passwordEncoder.encode("pass123"));
             etudiant2.setTelephone("0633333333");
             etudiant2.setRole(Role.ETUDIANT);
             etudiant2.setEstActif(true);
@@ -171,7 +173,7 @@ public class DevelopmentErpApplication {
             etudiant3.setNom("Mansouri");
             etudiant3.setPrenom("Amine");
             etudiant3.setEmail("amine.mansouri@student.ma");
-            etudiant3.setMotDePasse("pass123");
+            etudiant3.setMotDePasse(passwordEncoder.encode("pass123"));
             etudiant3.setTelephone("0655555555");
             etudiant3.setRole(Role.ETUDIANT);
             etudiant3.setEstActif(true);

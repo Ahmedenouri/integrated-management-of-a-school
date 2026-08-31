@@ -10,6 +10,7 @@ import com.gestion.etablissement.scolaire.developpementerp.repositories.Directeu
 import com.gestion.etablissement.scolaire.developpementerp.services.IDirecteurService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,12 +23,16 @@ public class DirecteurServiceImpl implements IDirecteurService {
 
     private final IDirecteurMapper directeurMapper;
     private final DirecteurRepository directeurRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public DirecteurResponce addDirecteur(DirecteurRequest directeurRequest) {
         log.debug("Adding directeur with email: {}", directeurRequest.getEmail());
 
         Directeur directeur = directeurMapper.map(directeurRequest);
+        if (directeur.getMotDePasse() != null && !directeur.getMotDePasse().startsWith("$2a$")) {
+            directeur.setMotDePasse(passwordEncoder.encode(directeur.getMotDePasse()));
+        }
         if (directeur.getRole() == null) {
             directeur.setRole(Role.DIRECTEUR);
         }
@@ -48,6 +53,9 @@ public class DirecteurServiceImpl implements IDirecteurService {
 
         Directeur existingDirecteur = findDirecteurOrThrow(idDirecteur);
         directeurMapper.updateFromRequest(directeurRequest, existingDirecteur);
+        if (directeurRequest.getMotDePasse() != null && !directeurRequest.getMotDePasse().isEmpty() && !directeurRequest.getMotDePasse().startsWith("$2a$")) {
+            existingDirecteur.setMotDePasse(passwordEncoder.encode(directeurRequest.getMotDePasse()));
+        }
 
         Directeur savedDirecteur = directeurRepository.save(existingDirecteur);
         return directeurMapper.map(savedDirecteur);

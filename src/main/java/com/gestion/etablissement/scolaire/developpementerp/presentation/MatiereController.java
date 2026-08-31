@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api-matiere")
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class MatiereController {
 
     private final IMatiereService matiereService;
@@ -33,6 +35,7 @@ public class MatiereController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PostMapping("/add-Matiere")
     public ResponseEntity<MatiereResponce> addMatiere(@Valid @RequestBody MatiereRequest request) {
         log.debug("add Matiere: {}", request.getIntitule());
@@ -71,6 +74,7 @@ public class MatiereController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PatchMapping("/update-Matiere/{id}")
     public ResponseEntity<MatiereResponce> updateMatiere(@PathVariable("id") Long id,
                                                          @Valid @RequestBody MatiereRequest request) {
@@ -83,6 +87,7 @@ public class MatiereController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Matiere/{id}")
     public ResponseEntity<Void> deleteMatiere(@PathVariable("id") Long id) {
         log.debug("Delete Matiere : {}", id);

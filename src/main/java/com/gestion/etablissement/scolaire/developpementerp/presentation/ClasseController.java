@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api-classe")
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class ClasseController {
 
     private final IClasseService classeService;
@@ -33,6 +35,7 @@ public class ClasseController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PostMapping("/add-Classe")
     public ResponseEntity<ClasseResponce> addClasse(@Valid @RequestBody ClasseRequest classeRequest) {
         log.debug("add classe: {}", classeRequest.getNom());
@@ -71,6 +74,7 @@ public class ClasseController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PatchMapping("/update-Classe/{idClasse}")
     public ResponseEntity<ClasseResponce> updateClasse(@PathVariable("idClasse") Long idClasse,
                                                        @Valid @RequestBody ClasseRequest classeRequest) {
@@ -83,6 +87,7 @@ public class ClasseController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Classe/{idClasse}")
     public ResponseEntity<Void> deleteClasse(@PathVariable("idClasse") Long idClasse) {
         log.debug("Delete Classe : {}", idClasse);

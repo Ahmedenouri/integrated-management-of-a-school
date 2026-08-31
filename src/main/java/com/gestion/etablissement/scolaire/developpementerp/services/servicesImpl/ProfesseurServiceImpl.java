@@ -10,6 +10,7 @@ import com.gestion.etablissement.scolaire.developpementerp.repositories.Professe
 import com.gestion.etablissement.scolaire.developpementerp.services.IProfesseurService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,12 +23,16 @@ public class ProfesseurServiceImpl implements IProfesseurService {
 
     private final IProfesseurMapper professeurMapper;
     private final ProfesseurRepository professeurRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ProfesseurResponce addProfesseur(ProfesseurRequest professeurRequest) {
         log.debug("Adding professeur with email: {}", professeurRequest.getEmail());
 
         Professeur professeur = professeurMapper.map(professeurRequest);
+        if (professeur.getMotDePasse() != null && !professeur.getMotDePasse().startsWith("$2a$")) {
+            professeur.setMotDePasse(passwordEncoder.encode(professeur.getMotDePasse()));
+        }
         initializeDefaults(professeur);
 
         Professeur savedProfesseur = professeurRepository.save(professeur);
@@ -40,6 +45,9 @@ public class ProfesseurServiceImpl implements IProfesseurService {
 
         Professeur existingProfesseur = findProfesseurOrThrow(idProfesseur);
         professeurMapper.updateFromRequest(professeurRequest, existingProfesseur);
+        if (professeurRequest.getMotDePasse() != null && !professeurRequest.getMotDePasse().isEmpty() && !professeurRequest.getMotDePasse().startsWith("$2a$")) {
+            existingProfesseur.setMotDePasse(passwordEncoder.encode(professeurRequest.getMotDePasse()));
+        }
 
         Professeur savedProfesseur = professeurRepository.save(existingProfesseur);
         return professeurMapper.map(savedProfesseur);
