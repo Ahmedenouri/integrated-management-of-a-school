@@ -158,4 +158,19 @@ public class NoteController {
         noteService.deleteNote(idNote);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Calculer la moyenne d'un étudiant pour une matière donnée.")
+    @GetMapping("/moyenne-matiere/{etudiantId}/{matiereId}")
+    public ResponseEntity<Double> calculateMoyenneMatiere(@PathVariable("etudiantId") Long etudiantId,
+                                                          @PathVariable("matiereId") Long matiereId) {
+        log.debug("calculateMoyenneMatiere - Etudiant: {}, Matiere: {}", etudiantId, matiereId);
+        return ResponseEntity.ok(noteService.calculateMoyenneMatiere(etudiantId, matiereId));
+    }
+
+    @Operation(summary = "Calculer la moyenne générale d'un étudiant (pondérée par coefficients).")
+    @GetMapping("/moyenne-generale/{etudiantId}")
+    public ResponseEntity<Double> calculateMoyenneGenerale(@PathVariable("etudiantId") Long etudiantId) {
+        log.debug("calculateMoyenneGenerale - Etudiant: {}", etudiantId);
+        return ResponseEntity.ok(noteService.calculateMoyenneGenerale(etudiantId));
+    }
 }

@@ -11,4 +11,5 @@ public interface IBulletinService {
     void deleteBulletin(Long idBulletin);
     List<BulletinResponce> getAllBulletins();
     BulletinResponce getBulletinById(Long idBulletin);
+    byte[] generateBulletinPdf(Long etudiantId);
 }

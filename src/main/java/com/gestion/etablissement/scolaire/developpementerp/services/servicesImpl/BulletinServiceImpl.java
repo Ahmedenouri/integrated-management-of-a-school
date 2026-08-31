@@ -3,12 +3,17 @@ package com.gestion.etablissement.scolaire.developpementerp.services.servicesImp
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoRequests.BulletinRequest;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.BulletinResponce;
 import com.gestion.etablissement.scolaire.developpementerp.model.entities.Bulletin;
+import com.gestion.etablissement.scolaire.developpementerp.model.entities.Etudiant;
+import com.gestion.etablissement.scolaire.developpementerp.model.entities.Note;
 import com.gestion.etablissement.scolaire.developpementerp.model.exceptions.ResourceNotFoundException;
 import com.gestion.etablissement.scolaire.developpementerp.model.mappers.IBulletinMapper;
 import com.gestion.etablissement.scolaire.developpementerp.repositories.BulletinRepository;
 import com.gestion.etablissement.scolaire.developpementerp.repositories.DirecteurRepository;
 import com.gestion.etablissement.scolaire.developpementerp.repositories.EtudiantRepository;
+import com.gestion.etablissement.scolaire.developpementerp.repositories.NoteRepository;
 import com.gestion.etablissement.scolaire.developpementerp.services.IBulletinService;
+import com.gestion.etablissement.scolaire.developpementerp.services.INoteService;
+import com.gestion.etablissement.scolaire.developpementerp.services.pdf.PdfGenerationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +32,9 @@ public class BulletinServiceImpl implements IBulletinService {
     private final BulletinRepository bulletinRepository;
     private final EtudiantRepository etudiantRepository;
     private final DirecteurRepository directeurRepository;
+    private final NoteRepository noteRepository;
+    private final INoteService noteService;
+    private final PdfGenerationService pdfGenerationService;
 
     @Override
     public BulletinResponce addBulletin(BulletinRequest bulletinRequest) {
@@ -75,6 +83,19 @@ public class BulletinServiceImpl implements IBulletinService {
     public BulletinResponce getBulletinById(Long idBulletin) {
         log.debug("Fetching bulletin ID: {}", idBulletin);
         return bulletinMapper.map(findBulletinOrThrow(idBulletin));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generateBulletinPdf(Long etudiantId) {
+        log.debug("Generating Bulletin PDF for etudiant ID: {}", etudiantId);
+        Etudiant etudiant = etudiantRepository.findById(etudiantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Etudiant not found with ID: " + etudiantId));
+
+        List<Note> notes = noteRepository.findByEtudiantId(etudiantId);
+        Double gpa = noteService.calculateMoyenneGenerale(etudiantId);
+
+        return pdfGenerationService.generateBulletinPdf(etudiant, notes, gpa);
     }
 
     private Bulletin findBulletinOrThrow(Long idBulletin) {

@@ -3,6 +3,7 @@ package com.gestion.etablissement.scolaire.developpementerp.services.servicesImp
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoRequests.SeanceRequest;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.SeanceResponce;
 import com.gestion.etablissement.scolaire.developpementerp.model.entities.Seance;
+import com.gestion.etablissement.scolaire.developpementerp.model.exceptions.BusinessException;
 import com.gestion.etablissement.scolaire.developpementerp.model.exceptions.ResourceNotFoundException;
 import com.gestion.etablissement.scolaire.developpementerp.model.mappers.ISeanceMapper;
 import com.gestion.etablissement.scolaire.developpementerp.repositories.*;
@@ -32,6 +33,8 @@ public class SeanceServiceImpl implements ISeanceService {
     public SeanceResponce addSeance(SeanceRequest seanceRequest) {
         log.debug("Adding Seance for emploi ID: {}", seanceRequest.getEmploiDuTempsId());
 
+        validateNoOverlap(seanceRequest, null);
+
         Seance seance = seanceMapper.map(seanceRequest);
         assignRelations(seance, seanceRequest);
 
@@ -44,6 +47,8 @@ public class SeanceServiceImpl implements ISeanceService {
         log.debug("Updating Seance ID: {}", idSeance);
 
         Seance existing = findSeanceOrThrow(idSeance);
+        validateNoOverlap(seanceRequest, idSeance);
+
         seanceMapper.updateFromRequest(seanceRequest, existing);
         assignRelations(existing, seanceRequest);
 
@@ -77,6 +82,30 @@ public class SeanceServiceImpl implements ISeanceService {
     private Seance findSeanceOrThrow(Long idSeance) {
         return seanceRepository.findById(idSeance)
                 .orElseThrow(() -> new ResourceNotFoundException("Seance not found with ID: " + idSeance));
+    }
+
+    private void validateNoOverlap(SeanceRequest request, Long currentSeanceId) {
+        if (request.getHeureDebut().isAfter(request.getHeureFin()) || request.getHeureDebut().equals(request.getHeureFin())) {
+            throw new BusinessException("L'heure de début doit être strictement antérieure à l'heure de fin.");
+        }
+
+        if (request.getSalleId() != null) {
+            List<Seance> roomConflicts = seanceRepository.findConflictingSalleSeances(
+                    request.getJour(), request.getSalleId(), request.getHeureDebut(), request.getHeureFin(), currentSeanceId
+            );
+            if (!roomConflicts.isEmpty()) {
+                throw new BusinessException("Conflit d'emploi du temps : La salle est déjà réservée sur ce créneau le " + request.getJour());
+            }
+        }
+
+        if (request.getProfesseurId() != null) {
+            List<Seance> profConflicts = seanceRepository.findConflictingProfesseurSeances(
+                    request.getJour(), request.getProfesseurId(), request.getHeureDebut(), request.getHeureFin(), currentSeanceId
+            );
+            if (!profConflicts.isEmpty()) {
+                throw new BusinessException("Conflit d'emploi du temps : Le professeur a déjà un cours sur ce créneau le " + request.getJour());
+            }
+        }
     }
 
     private void assignRelations(Seance seance, SeanceRequest request) {

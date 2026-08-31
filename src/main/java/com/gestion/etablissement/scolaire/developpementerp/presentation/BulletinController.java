@@ -89,4 +89,14 @@ public class BulletinController {
         bulletinService.deleteBulletin(idBulletin);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Générer et télécharger le bulletin officiel en format PDF pour un étudiant.")
+    @GetMapping(value = "/pdf/{etudiantId}", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> generateBulletinPdf(@PathVariable("etudiantId") Long etudiantId) {
+        log.debug("generateBulletinPdf - Etudiant ID: {}", etudiantId);
+        byte[] pdf = bulletinService.generateBulletinPdf(etudiantId);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=bulletin_" + etudiantId + ".pdf")
+                .body(pdf);
+    }
 }

@@ -89,4 +89,21 @@ public class PaiementController {
         paiementService.deletePaiement(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Récupérer la liste des paiements en retard ou partiels (Tableau de bord des impayés).")
+    @GetMapping("/impayes")
+    public ResponseEntity<List<PaiementResponce>> getImpayes() {
+        log.debug("getImpayes CONTROLLER");
+        return ResponseEntity.ok(paiementService.getImpayes());
+    }
+
+    @Operation(summary = "Générer et télécharger le reçu de paiement officiel en format PDF.")
+    @GetMapping(value = "/recu-pdf/{paiementId}", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> generateRecuPdf(@PathVariable("paiementId") Long paiementId) {
+        log.debug("generateRecuPdf - Paiement ID: {}", paiementId);
+        byte[] pdf = paiementService.generateRecuPdf(paiementId);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=recu_" + paiementId + ".pdf")
+                .body(pdf);
+    }
 }

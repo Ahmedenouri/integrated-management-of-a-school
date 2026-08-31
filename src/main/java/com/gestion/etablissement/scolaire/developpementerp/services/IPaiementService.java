@@ -11,4 +11,6 @@ public interface IPaiementService {
     void deletePaiement(Long idPaiement);
     List<PaiementResponce> getAllPaiements();
     PaiementResponce getPaiementById(Long idPaiement);
+    List<PaiementResponce> getImpayes();
+    byte[] generateRecuPdf(Long paiementId);
 }

@@ -16,4 +16,8 @@ public interface INoteService {
     List<NoteResponce> getAllNotes();
 
     NoteResponce getNoteById(Long idNote);
+
+    Double calculateMoyenneMatiere(Long etudiantId, Long matiereId);
+
+    Double calculateMoyenneGenerale(Long etudiantId);
 }
