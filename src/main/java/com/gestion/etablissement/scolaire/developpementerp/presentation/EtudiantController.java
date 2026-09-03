@@ -47,6 +47,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR','RESPONSABLE_FINANCIER')")
     @PostMapping("/add-Etudiant")
     public ResponseEntity<EtudiantResponce> addEtudiant(@RequestBody EtudiantRequest etudiantRequest) {
         log.debug("add etudiant : {}", etudiantRequest.getEmail());
@@ -74,6 +75,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR','RESPONSABLE_FINANCIER')")
     @GetMapping("/getAllEtudiants")
     public ResponseEntity<List<EtudiantResponce>> getAllEtudiants() {
         log.debug("getAllEtudiants CONTROLLER");
@@ -101,6 +103,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR','RESPONSABLE_FINANCIER')")
     @GetMapping("/getEtudiantById/{idEtudiant}")
     public ResponseEntity<EtudiantResponce> getEtudiantById(@PathVariable("idEtudiant") Long idEtudiant) {
         log.debug("getEtudiantById CONTROLLER - ID: {}", idEtudiant);
@@ -128,6 +131,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR','RESPONSABLE_FINANCIER')")
     @PatchMapping("/update-Etudiant/{idEtudiant}")
     public ResponseEntity<EtudiantResponce> updateEtudiant(@PathVariable("idEtudiant") Long idEtudiant,
                                                              @RequestBody EtudiantRequest etudiantRequest) {
@@ -154,6 +158,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @DeleteMapping("/delete-Etudiant/{idEtudiant}")
     public ResponseEntity<Void> deleteEtudiant(@PathVariable("idEtudiant") Long idEtudiant) {
         log.debug("Delete Etudiant : {}", idEtudiant);

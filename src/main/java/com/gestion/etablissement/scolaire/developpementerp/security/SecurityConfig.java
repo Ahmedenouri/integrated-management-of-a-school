@@ -1,5 +1,6 @@
 package com.gestion.etablissement.scolaire.developpementerp.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +10,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -88,7 +91,7 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
-
+            .httpBasic(Customizer.withDefaults())
             // ── Logout ────────────────────────────────────────────────────
             .logout(logout -> logout
                 .logoutUrl("/logout")
@@ -110,15 +113,25 @@ public class SecurityConfig {
             // ── CSRF ──────────────────────────────────────────────────────
             // CSRF is ENABLED by default in Spring Security 6.
             // Swagger/REST clients need to be aware; Thymeleaf forms include _csrf automatically.
-            .csrf(csrf -> csrf
+            /*.csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/v3/api-docs/**",
-                    "/swagger-ui/**"
+                    "/swagger-ui/**",
+                    "/api-user/**"
                 )
+            )*/
+            .csrf(AbstractHttpConfigurer::disable)
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+                    })
             )
 
             // ── Authentication provider ───────────────────────────────────
             .authenticationProvider(authenticationProvider());
+
 
         return http.build();
     }

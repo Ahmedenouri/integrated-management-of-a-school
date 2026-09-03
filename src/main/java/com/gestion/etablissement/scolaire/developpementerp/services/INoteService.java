@@ -20,4 +20,6 @@ public interface INoteService {
     Double calculateMoyenneMatiere(Long etudiantId, Long matiereId);
 
     Double calculateMoyenneGenerale(Long etudiantId);
+
+    List<NoteResponce> getNotesByEtudiantEmail(String emailEtudiant);
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,29 +20,30 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 @PreAuthorize("hasRole('DIRECTEUR')")
+@SecurityRequirement(name = "basicAuth")
 public class UtilisateurController {
     private final IUtilisateurService utilisateurService;
 
     @Operation(summary = "Cette opération permet selection tout les utilisateur dans la base.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "L'opération est effectuée avec succés",content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UtilisateurResponce.class))
 
             }),
             @ApiResponse(responseCode = "400",description = "La requete envoyée incorrect. Bad Request !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "401",description = "l'utilisateur n'est pas authentifié",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "403",description = "l'utilisateur n'est pas authorisé à faire l'action demandé",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "404",description = "la resource demandée est introuvable. Not Found !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "500",description = "Erreur Server !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             })
     })
     @GetMapping("/getAllUsers")
@@ -54,26 +56,26 @@ public class UtilisateurController {
     @Operation(summary = "Cette opération permet selection Utilisateur par ID  salle dans la base.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",description = "L'opération est effectuée avec succés",content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UtilisateurResponce.class))
 
             }),
             @ApiResponse(responseCode = "400",description = "La requete envoyée incorrect. Bad Request !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "401",description = "l'utilisateur n'est pas authentifié",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "403",description = "l'utilisateur n'est pas authorisé à faire l'action demandé",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "404",description = "la resource demandée est introuvable. Not Found !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             }),
             @ApiResponse(responseCode = "500",description = "Erreur Server !",content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurController.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UtilisateurResponce.class))
             })
     })
-    @GetMapping("/getUserById{idUser}")
+    @GetMapping("/getUserById/{idUser}")
     public UtilisateurResponce getUserById(@PathVariable(value = "idUser") Long idUser){
         log.debug("getUserById CONTROLLER");
         return utilisateurService.getUserById(idUser);

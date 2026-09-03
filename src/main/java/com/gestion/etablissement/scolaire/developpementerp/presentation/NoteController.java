@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -174,5 +175,13 @@ public class NoteController {
     public ResponseEntity<Double> calculateMoyenneGenerale(@PathVariable("etudiantId") Long etudiantId) {
         log.debug("calculateMoyenneGenerale - Etudiant: {}", etudiantId);
         return ResponseEntity.ok(noteService.calculateMoyenneGenerale(etudiantId));
+    }
+    @GetMapping("/mes-notes")
+    @PreAuthorize("hasRole('ETUDIANT')")
+    public ResponseEntity<List<NoteResponce>> getMesNotes(Authentication authentication) {
+        // authentication.getName() kat-rje3 l-email dyal l-etudiant li m-connecter
+        String emailEtudiant = authentication.getName();
+        List<NoteResponce> mesNotes = noteService.getNotesByEtudiantEmail(emailEtudiant);
+        return ResponseEntity.ok(mesNotes);
     }
 }

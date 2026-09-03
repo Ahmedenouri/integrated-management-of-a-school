@@ -32,12 +32,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                     return new UsernameNotFoundException("Utilisateur introuvable avec l'email : " + email);
                 });
 
-        if (!Boolean.TRUE.equals(utilisateur.getEstActif())) {
+        boolean estActif = Boolean.TRUE.equals(utilisateur.getEstActif());
+
+        if (!estActif) {
             log.warn("User account is disabled for email: {}", email);
             throw new UsernameNotFoundException("Compte désactivé pour l'utilisateur : " + email);
         }
 
-        String roleWithPrefix = "ROLE_" + utilisateur.getRole().name();
+        String roleName = utilisateur.getRole().name();
+        String roleWithPrefix = roleName.startsWith("ROLE_") ? roleName : "ROLE_" + roleName;
+
         log.debug("User {} authenticated with role {}", email, roleWithPrefix);
 
         return User.builder()
@@ -45,9 +49,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .password(utilisateur.getMotDePasse())
                 .authorities(List.of(new SimpleGrantedAuthority(roleWithPrefix)))
                 .accountExpired(false)
-                .accountLocked(!Boolean.TRUE.equals(utilisateur.getEstActif()))
+                .accountLocked(false)
                 .credentialsExpired(false)
-                .disabled(!Boolean.TRUE.equals(utilisateur.getEstActif()))
+                .disabled(!estActif)
                 .build();
     }
 }

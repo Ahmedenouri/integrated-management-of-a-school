@@ -355,5 +355,4 @@ public class DevelopmentErpApplication {
             System.out.println("✅ Les données d'initialisation de l'ERP ont été insérées avec succès !");
         };
     }
-    /**************************************************************************/
 }

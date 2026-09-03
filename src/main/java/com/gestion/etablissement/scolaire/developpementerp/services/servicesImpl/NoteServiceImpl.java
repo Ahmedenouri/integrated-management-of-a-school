@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -162,6 +163,20 @@ public class NoteServiceImpl implements INoteService {
         if (totalSubjectCoefficients == 0.0) return 0.0;
         return Math.round((totalSubjectWeightedAverage / totalSubjectCoefficients) * 100.0) / 100.0;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<NoteResponce> getNotesByEtudiantEmail(String email) {
+        Etudiant etudiant = etudiantRepository.findByEmail(email);
+                //.orElseThrow(() -> new EntityNotFoundException("Etudiant introuvable"));
+
+        List<Note> notes = noteRepository.findByEtudiantId(etudiant.getId());
+
+        return notes.stream()
+                .map(noteMapper::map)
+                .collect(Collectors.toList());
+    }
+
 
     private Note findNoteOrThrow(Long idNote) {
         return noteRepository.findById(idNote)
