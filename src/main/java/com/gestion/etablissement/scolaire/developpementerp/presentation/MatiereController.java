@@ -48,6 +48,7 @@ public class MatiereController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = MatiereResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'PROFESSEUR', 'ETUDIANT')")
     @GetMapping("/getAllMatieres")
     public ResponseEntity<List<MatiereResponce>> getAllMatieres() {
         log.debug("getAllMatieres CONTROLLER");
@@ -61,6 +62,7 @@ public class MatiereController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'PROFESSEUR', 'ETUDIANT')")
     @GetMapping("/getMatiereById/{id}")
     public ResponseEntity<MatiereResponce> getMatiereById(@PathVariable("id") Long id) {
         log.debug("getMatiereById CONTROLLER - ID: {}", id);

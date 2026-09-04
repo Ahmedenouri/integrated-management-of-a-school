@@ -100,6 +100,13 @@ public class PaiementServiceImpl implements IPaiementService {
         return pdfGenerationService.generateRecuPaiementPdf(paiement);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaiementResponce> getPaiementsByEtudiantEmail(String email) {
+        log.debug("Fetching paiements for etudiant email: {}", email);
+        return paiementMapper.mapList(paiementRepository.findByEtudiantEmail(email));
+    }
+
     private Paiement findPaiementOrThrow(Long idPaiement) {
         return paiementRepository.findById(idPaiement)
                 .orElseThrow(() -> new ResourceNotFoundException("Paiement not found with ID: " + idPaiement));

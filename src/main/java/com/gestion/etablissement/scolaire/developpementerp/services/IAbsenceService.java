@@ -11,4 +11,5 @@ public interface IAbsenceService {
     void deleteAbsence(Long idAbsence);
     List<AbsenceResponce> getAllAbsences();
     AbsenceResponce getAbsenceById(Long idAbsence);
+    List<AbsenceResponce> getAbsencesByEtudiantEmail(String email);
 }

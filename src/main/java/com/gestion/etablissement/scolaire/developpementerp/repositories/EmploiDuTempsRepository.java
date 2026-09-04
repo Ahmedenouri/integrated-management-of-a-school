@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmploiDuTempsRepository extends JpaRepository<EmploiDuTemps,Long> {
+
+    java.util.List<EmploiDuTemps> findByClasseId(Long classeId);
+
+    java.util.List<EmploiDuTemps> findByClasseEtudiantsEmail(String email);
 }

@@ -15,7 +15,6 @@ public class UtilisateurResponce {
     private String nom;
     private String prenom;
     private String email;
-    private String motDePasse;
     private String telephone;
 
     private Role role;

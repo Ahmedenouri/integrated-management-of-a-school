@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +24,8 @@ import java.util.List;
 @RequestMapping("/api-paiement")
 @AllArgsConstructor
 @Slf4j
-@PreAuthorize("hasAnyRole('RESPONSABLE_FINANCIER', 'DIRECTEUR')")
+@PreAuthorize("isAuthenticated()")
+@SecurityRequirement(name = "basicAuth")
 public class PaiementController {
 
     private final IPaiementService paiementService;
@@ -33,8 +36,10 @@ public class PaiementController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = PaiementResponce.class))
             }),
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
+            @ApiResponse(responseCode = "403", description = "Accès refusé"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER')")
     @PostMapping("/add-Paiement")
     public ResponseEntity<PaiementResponce> addPaiement(@Valid @RequestBody PaiementRequest request) {
         log.debug("add Paiement ref: {}", request.getReferencePaiement());
@@ -45,8 +50,10 @@ public class PaiementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = PaiementResponce.class))
-            })
+            }),
+            @ApiResponse(responseCode = "403", description = "Accès refusé")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER')")
     @GetMapping("/getAllPaiements")
     public ResponseEntity<List<PaiementResponce>> getAllPaiements() {
         log.debug("getAllPaiements CONTROLLER");
@@ -58,21 +65,26 @@ public class PaiementController {
             @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = PaiementResponce.class))
             }),
+            @ApiResponse(responseCode = "403", description = "Accès refusé"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER') or @securityService.isPaiementOwner(#id)")
     @GetMapping("/getPaiementById/{id}")
     public ResponseEntity<PaiementResponce> getPaiementById(@PathVariable("id") Long id) {
         log.debug("getPaiementById CONTROLLER - ID: {}", id);
         return ResponseEntity.ok(paiementService.getPaiementById(id));
     }
 
+    @Operation(summary = "Consulter la liste de ses propres paiements (Espace Étudiant).")
+    @PreAuthorize("hasRole('ETUDIANT')")
+    @GetMapping("/mes-paiements")
+    public ResponseEntity<List<PaiementResponce>> getMesPaiements(Authentication authentication) {
+        log.debug("getMesPaiements pour étudiant : {}", authentication.getName());
+        return ResponseEntity.ok(paiementService.getPaiementsByEtudiantEmail(authentication.getName()));
+    }
+
     @Operation(summary = "Cette opération permet de modifier un Paiement dans la base.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = PaiementResponce.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
-    })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER')")
     @PatchMapping("/update-Paiement/{id}")
     public ResponseEntity<PaiementResponce> updatePaiement(@PathVariable("id") Long id,
                                                            @Valid @RequestBody PaiementRequest request) {
@@ -81,10 +93,7 @@ public class PaiementController {
     }
 
     @Operation(summary = "Cette opération permet de supprimer un Paiement dans la base.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
-            @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
-    })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Paiement/{id}")
     public ResponseEntity<Void> deletePaiement(@PathVariable("id") Long id) {
         log.debug("Delete Paiement : {}", id);
@@ -93,6 +102,7 @@ public class PaiementController {
     }
 
     @Operation(summary = "Récupérer la liste des paiements en retard ou partiels (Tableau de bord des impayés).")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER')")
     @GetMapping("/impayes")
     public ResponseEntity<List<PaiementResponce>> getImpayes() {
         log.debug("getImpayes CONTROLLER");
@@ -100,6 +110,7 @@ public class PaiementController {
     }
 
     @Operation(summary = "Générer et télécharger le reçu de paiement officiel en format PDF.")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER') or @securityService.isPaiementOwner(#paiementId)")
     @GetMapping(value = "/recu-pdf/{paiementId}", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateRecuPdf(@PathVariable("paiementId") Long paiementId) {
         log.debug("generateRecuPdf - Paiement ID: {}", paiementId);

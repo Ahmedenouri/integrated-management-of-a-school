@@ -16,6 +16,8 @@ public interface PaiementRepository extends JpaRepository<Paiement, Long> {
 
     List<Paiement> findByEtudiantId(Long etudiantId);
 
+    List<Paiement> findByEtudiantEmail(String email);
+
     @Query("SELECT COALESCE(SUM(p.montant), 0.0) FROM Paiement p WHERE p.statut = :statut")
     Double sumMontantByStatut(@Param("statut") StatutPaiement statut);
 

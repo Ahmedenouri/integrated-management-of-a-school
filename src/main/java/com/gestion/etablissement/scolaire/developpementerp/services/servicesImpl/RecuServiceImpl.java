@@ -71,6 +71,13 @@ public class RecuServiceImpl implements IRecuService {
         return recuMapper.map(findRecuOrThrow(idRecu));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<RecuResponce> getRecusByEtudiantEmail(String email) {
+        log.debug("Fetching Recus for etudiant email: {}", email);
+        return recuMapper.mapList(recuRepository.findByPaiementEtudiantEmail(email));
+    }
+
     private Recu findRecuOrThrow(Long idRecu) {
         return recuRepository.findById(idRecu)
                 .orElseThrow(() -> new ResourceNotFoundException("Recu not found with ID: " + idRecu));

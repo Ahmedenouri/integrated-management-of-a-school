@@ -3,6 +3,8 @@ package com.gestion.etablissement.scolaire.developpementerp.presentation;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoRequests.ProfesseurRequest;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.ProfesseurResponce;
 import com.gestion.etablissement.scolaire.developpementerp.services.IProfesseurService;
+import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.ClasseResponce;
+import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.EtudiantResponce;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api-professeur")
 @AllArgsConstructor
 @Slf4j
-@PreAuthorize("hasRole('DIRECTEUR')")
+@PreAuthorize("isAuthenticated()")
 public class ProfesseurController {
 
     private final IProfesseurService professeurService;
@@ -47,6 +50,7 @@ public class ProfesseurController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProfesseurResponce.class))
             })
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PostMapping("/add-Professeur")
     public ResponseEntity<ProfesseurResponce> addProfesseur(@RequestBody ProfesseurRequest professeurRequest) {
         log.debug("add professeur : {}", professeurRequest.getEmail());
@@ -74,10 +78,27 @@ public class ProfesseurController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProfesseurResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @GetMapping("/getAllProfesseurs")
     public ResponseEntity<List<ProfesseurResponce>> getAllProfesseurs() {
         log.debug("getAllProfesseurs CONTROLLER");
         return ResponseEntity.ok(professeurService.getAllProfesseurs());
+    }
+
+    @Operation(summary = "Récupérer les classes attribuées au professeur connecté.")
+    @PreAuthorize("hasRole('PROFESSEUR')")
+    @GetMapping("/mes-classes")
+    public ResponseEntity<List<ClasseResponce>> getMesClasses(Authentication authentication) {
+        log.debug("getMesClasses for {}", authentication.getName());
+        return ResponseEntity.ok(professeurService.getClassesForProfesseur(authentication.getName()));
+    }
+
+    @Operation(summary = "Récupérer la liste des étudiants suivis par le professeur connecté.")
+    @PreAuthorize("hasRole('PROFESSEUR')")
+    @GetMapping("/mes-etudiants")
+    public ResponseEntity<List<EtudiantResponce>> getMesEtudiants(Authentication authentication) {
+        log.debug("getMesEtudiants for {}", authentication.getName());
+        return ResponseEntity.ok(professeurService.getEtudiantsForProfesseur(authentication.getName()));
     }
 
     @Operation(summary = "Cette opération permet de récupérer un professeur par son ID.")
@@ -101,6 +122,7 @@ public class ProfesseurController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProfesseurResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @GetMapping("/getProfesseurById/{idProfesseur}")
     public ResponseEntity<ProfesseurResponce> getProfesseurById(@PathVariable("idProfesseur") Long idProfesseur) {
         log.debug("getProfesseurById CONTROLLER - ID: {}", idProfesseur);
@@ -128,6 +150,7 @@ public class ProfesseurController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProfesseurResponce.class))
             })
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PatchMapping("/update-Professeur/{idProfesseur}")
     public ResponseEntity<ProfesseurResponce> updateProfesseur(@PathVariable("idProfesseur") Long idProfesseur,
                                                                @RequestBody ProfesseurRequest professeurRequest) {
@@ -154,6 +177,7 @@ public class ProfesseurController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProfesseurResponce.class))
             })
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Professeur/{idProfesseur}")
     public ResponseEntity<Void> deleteProfesseur(@PathVariable("idProfesseur") Long idProfesseur) {
         log.debug("Delete Professeur : {}", idProfesseur);

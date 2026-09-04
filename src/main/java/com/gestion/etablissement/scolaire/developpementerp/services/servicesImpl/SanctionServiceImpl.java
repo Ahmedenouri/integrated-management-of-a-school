@@ -76,6 +76,13 @@ public class SanctionServiceImpl implements ISanctionService {
         return sanctionMapper.map(findSanctionOrThrow(idSanction));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<SanctionResponce> getSanctionsByEtudiantEmail(String email) {
+        log.debug("Fetching sanctions for etudiant email: {}", email);
+        return sanctionMapper.mapList(sanctionRepository.findByEtudiantEmail(email));
+    }
+
     private Sanction findSanctionOrThrow(Long idSanction) {
         return sanctionRepository.findById(idSanction)
                 .orElseThrow(() -> new ResourceNotFoundException("Sanction not found with ID: " + idSanction));

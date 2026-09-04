@@ -13,6 +13,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
 
     List<Absence> findByEtudiantId(Long etudiantId);
 
+    List<Absence> findByEtudiantEmail(String email);
+
     @Query("SELECT COALESCE(SUM(a.nombreHeures), 0) FROM Absence a WHERE a.etudiant.id = :etudiantId")
     Integer sumNombreHeuresByEtudiantId(@Param("etudiantId") Long etudiantId);
 }

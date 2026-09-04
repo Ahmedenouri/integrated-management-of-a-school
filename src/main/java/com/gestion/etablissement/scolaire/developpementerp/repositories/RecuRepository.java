@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RecuRepository extends JpaRepository<Recu,Long> {
+    java.util.List<Recu> findByPaiementEtudiantEmail(String email);
 }

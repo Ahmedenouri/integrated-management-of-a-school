@@ -76,6 +76,17 @@ public class EmploiDuTempsServiceImpl implements IEmploiDuTempsService {
         return emploiDuTempsMapper.map(findEmploiOrThrow(idEmploi));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public EmploiDuTempsResponce getEmploiForEtudiant(String email) {
+        log.debug("Fetching EmploiDuTemps for etudiant: {}", email);
+        List<EmploiDuTemps> emplois = emploiDuTempsRepository.findByClasseEtudiantsEmail(email);
+        if (emplois.isEmpty()) {
+            throw new ResourceNotFoundException("Aucun emploi du temps trouvé pour l'étudiant avec l'email: " + email);
+        }
+        return emploiDuTempsMapper.map(emplois.get(0));
+    }
+
     private EmploiDuTemps findEmploiOrThrow(Long idEmploi) {
         return emploiDuTempsRepository.findById(idEmploi)
                 .orElseThrow(() -> new ResourceNotFoundException("EmploiDuTemps not found with ID: " + idEmploi));

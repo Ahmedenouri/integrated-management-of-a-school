@@ -13,4 +13,5 @@ public interface IPaiementService {
     PaiementResponce getPaiementById(Long idPaiement);
     List<PaiementResponce> getImpayes();
     byte[] generateRecuPdf(Long paiementId);
+    List<PaiementResponce> getPaiementsByEtudiantEmail(String email);
 }

@@ -103,14 +103,14 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
-    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR','RESPONSABLE_FINANCIER')")
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR','RESPONSABLE_FINANCIER') or @securityService.isEtudiantSelf(#idEtudiant) or @securityService.isProfesseurOfEtudiant(#idEtudiant)")
     @GetMapping("/getEtudiantById/{idEtudiant}")
     public ResponseEntity<EtudiantResponce> getEtudiantById(@PathVariable("idEtudiant") Long idEtudiant) {
         log.debug("getEtudiantById CONTROLLER - ID: {}", idEtudiant);
         return ResponseEntity.ok(etudiantService.getEtudiantById(idEtudiant));
     }
 
-    @Operation(summary = "Cette opération permet de modifier un Etudiant dans la base.")
+    @Operation(summary = "Cette opération permet de modifier une Etudiant dans la base.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
@@ -158,7 +158,7 @@ public class EtudiantController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EtudiantResponce.class))
             })
     })
-    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Etudiant/{idEtudiant}")
     public ResponseEntity<Void> deleteEtudiant(@PathVariable("idEtudiant") Long idEtudiant) {
         log.debug("Delete Etudiant : {}", idEtudiant);

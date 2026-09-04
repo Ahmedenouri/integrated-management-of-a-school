@@ -35,7 +35,7 @@ public class ClasseController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
-    @PreAuthorize("hasRole('DIRECTEUR')")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @PostMapping("/add-Classe")
     public ResponseEntity<ClasseResponce> addClasse(@Valid @RequestBody ClasseRequest classeRequest) {
         log.debug("add classe: {}", classeRequest.getNom());
@@ -48,6 +48,7 @@ public class ClasseController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ClasseResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'RESPONSABLE_FINANCIER')")
     @GetMapping("/getAllClasses")
     public ResponseEntity<List<ClasseResponce>> getAllClasses() {
         log.debug("getAllClasses CONTROLLER");
@@ -61,6 +62,7 @@ public class ClasseController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'RESPONSABLE_FINANCIER')")
     @GetMapping("/getClasseById/{idClasse}")
     public ResponseEntity<ClasseResponce> getClasseById(@PathVariable("idClasse") Long idClasse) {
         log.debug("getClasseById CONTROLLER - ID: {}", idClasse);
@@ -74,7 +76,7 @@ public class ClasseController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
-    @PreAuthorize("hasRole('DIRECTEUR')")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @PatchMapping("/update-Classe/{idClasse}")
     public ResponseEntity<ClasseResponce> updateClasse(@PathVariable("idClasse") Long idClasse,
                                                        @Valid @RequestBody ClasseRequest classeRequest) {
@@ -87,7 +89,7 @@ public class ClasseController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
-    @PreAuthorize("hasRole('DIRECTEUR')")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @DeleteMapping("/delete-Classe/{idClasse}")
     public ResponseEntity<Void> deleteClasse(@PathVariable("idClasse") Long idClasse) {
         log.debug("Delete Classe : {}", idClasse);

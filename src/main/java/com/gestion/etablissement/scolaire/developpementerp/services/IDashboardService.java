@@ -4,4 +4,6 @@ import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponc
 
 public interface IDashboardService {
     DashboardResponce getDashboardStats();
+    com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardFinancierResponse getDashboardFinancierStats();
+    com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardDisciplineResponse getDashboardDisciplineStats();
 }

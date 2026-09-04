@@ -12,5 +12,7 @@ public interface SanctionRepository extends JpaRepository<Sanction, Long> {
 
     List<Sanction> findByEtudiantId(Long etudiantId);
 
+    List<Sanction> findByEtudiantEmail(String email);
+
     boolean existsByEtudiantIdAndType(Long etudiantId, TypeSanction type);
 }

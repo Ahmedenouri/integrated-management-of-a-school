@@ -11,4 +11,5 @@ public interface IRecuService {
     void deleteRecu(Long idRecu);
     List<RecuResponce> getAllRecus();
     RecuResponce getRecuById(Long idRecu);
+    List<RecuResponce> getRecusByEtudiantEmail(String email);
 }

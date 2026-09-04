@@ -11,4 +11,6 @@ public interface IProfesseurService {
     void deleteProfesseur(Long idProfesseur);
     List<ProfesseurResponce> getAllProfesseurs();
     ProfesseurResponce getProfesseurById(Long idProfesseur);
+    List<com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.ClasseResponce> getClassesForProfesseur(String email);
+    List<com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.EtudiantResponce> getEtudiantsForProfesseur(String email);
 }

@@ -1,12 +1,11 @@
 package com.gestion.etablissement.scolaire.developpementerp.presentation;
 
+import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardDisciplineResponse;
+import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardFinancierResponse;
 import com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardResponce;
 import com.gestion.etablissement.scolaire.developpementerp.services.IDashboardService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,21 +18,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api-dashboard")
 @AllArgsConstructor
 @Slf4j
-@PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER', 'SURVEILLANT')")
+@PreAuthorize("isAuthenticated()")
+@Tag(name = "Dashboard", description = "Tableaux de bord cloisonnés par profil")
 public class DashboardController {
 
     private final IDashboardService dashboardService;
 
-    @Operation(summary = "Récupérer les statistiques agrégées en temps réel (Tableau de bord Pédagogique, Disciplinaire et Financier).")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = DashboardResponce.class))
-            }),
-            @ApiResponse(responseCode = "500", description = "Erreur Serveur !")
-    })
+    @Operation(summary = "Récupérer les statistiques globales agrégées (Directeur uniquement).")
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @GetMapping("/stats")
     public ResponseEntity<DashboardResponce> getDashboardStats() {
         log.debug("GET /api-dashboard/stats CONTROLLER");
         return ResponseEntity.ok(dashboardService.getDashboardStats());
+    }
+
+    @Operation(summary = "Récupérer les statistiques financières (Directeur et Responsable Financier).")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'RESPONSABLE_FINANCIER')")
+    @GetMapping("/financier")
+    public ResponseEntity<DashboardFinancierResponse> getDashboardFinancier() {
+        log.debug("GET /api-dashboard/financier CONTROLLER");
+        return ResponseEntity.ok(dashboardService.getDashboardFinancierStats());
+    }
+
+    @Operation(summary = "Récupérer les statistiques disciplinaires (Directeur et Surveillant).")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
+    @GetMapping("/discipline")
+    public ResponseEntity<DashboardDisciplineResponse> getDashboardDiscipline() {
+        log.debug("GET /api-dashboard/discipline CONTROLLER");
+        return ResponseEntity.ok(dashboardService.getDashboardDisciplineStats());
     }
 }

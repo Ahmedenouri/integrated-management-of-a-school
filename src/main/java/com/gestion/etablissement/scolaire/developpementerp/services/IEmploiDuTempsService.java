@@ -11,4 +11,5 @@ public interface IEmploiDuTempsService {
     void deleteEmploiDuTemps(Long idEmploi);
     List<EmploiDuTempsResponce> getAllEmploisDuTemps();
     EmploiDuTempsResponce getEmploiDuTempsById(Long idEmploi);
+    EmploiDuTempsResponce getEmploiForEtudiant(String email);
 }

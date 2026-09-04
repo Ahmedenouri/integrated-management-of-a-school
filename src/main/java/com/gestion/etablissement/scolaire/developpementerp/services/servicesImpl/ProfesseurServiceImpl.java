@@ -24,6 +24,22 @@ public class ProfesseurServiceImpl implements IProfesseurService {
     private final IProfesseurMapper professeurMapper;
     private final ProfesseurRepository professeurRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.gestion.etablissement.scolaire.developpementerp.repositories.SeanceRepository seanceRepository;
+    private final com.gestion.etablissement.scolaire.developpementerp.model.mappers.IClasseMapper classeMapper;
+    private final com.gestion.etablissement.scolaire.developpementerp.repositories.EtudiantRepository etudiantRepository;
+    private final com.gestion.etablissement.scolaire.developpementerp.model.mappers.IEtudiantMapper etudiantMapper;
+
+    @Override
+    public List<com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.ClasseResponce> getClassesForProfesseur(String email) {
+        log.debug("Fetching classes for professeur: {}", email);
+        return classeMapper.mapList(seanceRepository.findDistinctClassesByProfesseurEmail(email));
+    }
+
+    @Override
+    public List<com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.EtudiantResponce> getEtudiantsForProfesseur(String email) {
+        log.debug("Fetching etudiants for professeur: {}", email);
+        return etudiantMapper.mapList(etudiantRepository.findEtudiantsByProfesseurEmail(email));
+    }
 
     @Override
     public ProfesseurResponce addProfesseur(ProfesseurRequest professeurRequest) {

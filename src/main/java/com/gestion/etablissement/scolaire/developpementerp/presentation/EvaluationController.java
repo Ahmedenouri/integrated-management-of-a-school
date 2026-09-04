@@ -35,7 +35,7 @@ public class EvaluationController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
-    @PreAuthorize("hasAnyRole('PROFESSEUR', 'DIRECTEUR')")
+    @PreAuthorize("hasRole('DIRECTEUR') or (hasRole('PROFESSEUR') and @securityService.canManageEvaluation(null, #request))")
     @PostMapping("/add-Evaluation")
     public ResponseEntity<EvaluationResponce> addEvaluation(@Valid @RequestBody EvaluationRequest request) {
         log.debug("add Evaluation: {}", request.getTitre());
@@ -48,6 +48,7 @@ public class EvaluationController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'PROFESSEUR', 'ETUDIANT')")
     @GetMapping("/getAllEvaluations")
     public ResponseEntity<List<EvaluationResponce>> getAllEvaluations() {
         log.debug("getAllEvaluations CONTROLLER");
@@ -61,6 +62,7 @@ public class EvaluationController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT', 'PROFESSEUR', 'ETUDIANT')")
     @GetMapping("/getEvaluationById/{id}")
     public ResponseEntity<EvaluationResponce> getEvaluationById(@PathVariable("id") Long id) {
         log.debug("getEvaluationById CONTROLLER - ID: {}", id);
@@ -74,7 +76,7 @@ public class EvaluationController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
-    @PreAuthorize("hasAnyRole('PROFESSEUR', 'DIRECTEUR')")
+    @PreAuthorize("hasRole('DIRECTEUR') or (hasRole('PROFESSEUR') and @securityService.canManageEvaluation(#id, #request))")
     @PatchMapping("/update-Evaluation/{id}")
     public ResponseEntity<EvaluationResponce> updateEvaluation(@PathVariable("id") Long id,
                                                                @Valid @RequestBody EvaluationRequest request) {
@@ -87,7 +89,7 @@ public class EvaluationController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
-    @PreAuthorize("hasRole('DIRECTEUR')")
+    @PreAuthorize("hasRole('DIRECTEUR') or (hasRole('PROFESSEUR') and @securityService.canManageEvaluation(#id, null))")
     @DeleteMapping("/delete-Evaluation/{id}")
     public ResponseEntity<Void> deleteEvaluation(@PathVariable("id") Long id) {
         log.debug("Delete Evaluation : {}", id);

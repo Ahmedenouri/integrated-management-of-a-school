@@ -85,4 +85,68 @@ public class DashboardServiceImpl implements IDashboardService {
                 .nombreEtudiantsEnRetard(nbEtudiantsEnRetard != null ? nbEtudiantsEnRetard : 0L)
                 .build();
     }
+
+    @Override
+    public com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardFinancierResponse getDashboardFinancierStats() {
+        log.debug("Calculating financial dashboard statistics");
+        Long totalEtudiants = etudiantRepository.count();
+        Long totalClasses = classeRepository.count();
+        Double totalEncaissement = paiementRepository.sumMontantByStatut(StatutPaiement.PAYE);
+        Double totalImpayes = paiementRepository.sumMontantByStatutIn(List.of(StatutPaiement.EN_RETARD, StatutPaiement.PARTIEL));
+        Long nbEtudiantsEnRetard = paiementRepository.countDistinctEtudiantByStatutIn(List.of(StatutPaiement.EN_RETARD, StatutPaiement.PARTIEL));
+
+        return com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardFinancierResponse.builder()
+                .totalEtudiants(totalEtudiants)
+                .totalClasses(totalClasses)
+                .totalEncaissementPercu(totalEncaissement != null ? totalEncaissement : 0.0)
+                .totalImpayes(totalImpayes != null ? totalImpayes : 0.0)
+                .nombreEtudiantsEnRetard(nbEtudiantsEnRetard != null ? nbEtudiantsEnRetard : 0L)
+                .build();
+    }
+
+    @Override
+    public com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardDisciplineResponse getDashboardDisciplineStats() {
+        log.debug("Calculating disciplinary dashboard statistics");
+        Long totalEtudiants = etudiantRepository.count();
+        Long totalClasses = classeRepository.count();
+        Long totalMatieres = matiereRepository.count();
+
+        List<Note> notes = noteRepository.findAll();
+        double moyenneEtablissement = 0.0;
+        if (!notes.isEmpty()) {
+            double sumVal = notes.stream().filter(n -> n.getValeur() != null).mapToDouble(Note::getValeur).sum();
+            long countVal = notes.stream().filter(n -> n.getValeur() != null).count();
+            if (countVal > 0) {
+                moyenneEtablissement = Math.round((sumVal / countVal) * 100.0) / 100.0;
+            }
+        }
+
+        Long totalAbsences = absenceRepository.count();
+        Integer totalHeuresAbsences = absenceRepository.findAll().stream()
+                .filter(a -> a.getNombreHeures() != null)
+                .mapToInt(a -> a.getNombreHeures())
+                .sum();
+
+        List<Sanction> sanctions = sanctionRepository.findAll();
+        Long totalSanctions = (long) sanctions.size();
+
+        Map<String, Long> sanctionsParType = new HashMap<>();
+        for (Sanction s : sanctions) {
+            if (s.getType() != null) {
+                String typeStr = s.getType().name();
+                sanctionsParType.put(typeStr, sanctionsParType.getOrDefault(typeStr, 0L) + 1);
+            }
+        }
+
+        return com.gestion.etablissement.scolaire.developpementerp.model.dtos.dtoResponce.DashboardDisciplineResponse.builder()
+                .totalEtudiants(totalEtudiants)
+                .totalClasses(totalClasses)
+                .totalMatieres(totalMatieres)
+                .moyenneEtablissement(moyenneEtablissement)
+                .totalAbsences(totalAbsences)
+                .totalHeuresAbsences(totalHeuresAbsences)
+                .totalSanctions(totalSanctions)
+                .sanctionsParType(sanctionsParType)
+                .build();
+    }
 }

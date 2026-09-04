@@ -87,6 +87,13 @@ public class AbsenceServiceImpl implements IAbsenceService {
         return absenceMapper.map(findAbsenceOrThrow(idAbsence));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<AbsenceResponce> getAbsencesByEtudiantEmail(String email) {
+        log.debug("Fetching absences for etudiant email: {}", email);
+        return absenceMapper.mapList(absenceRepository.findByEtudiantEmail(email));
+    }
+
     private Absence findAbsenceOrThrow(Long idAbsence) {
         return absenceRepository.findById(idAbsence)
                 .orElseThrow(() -> new ResourceNotFoundException("Absence not found with ID: " + idAbsence));

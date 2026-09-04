@@ -11,4 +11,6 @@ public interface ISeanceService {
     void deleteSeance(Long idSeance);
     List<SeanceResponce> getAllSeances();
     SeanceResponce getSeanceById(Long idSeance);
+    List<SeanceResponce> getSeancesForProfesseur(String email);
+    List<SeanceResponce> getSeancesForEtudiant(String email);
 }

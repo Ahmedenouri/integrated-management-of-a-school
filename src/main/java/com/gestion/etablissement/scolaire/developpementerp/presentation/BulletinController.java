@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,30 +24,35 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 @PreAuthorize("isAuthenticated()")
+@SecurityRequirement(name = "basicAuth")
 public class BulletinController {
 
     private final IBulletinService bulletinService;
 
-    @Operation(summary = "Cette opération permet d'ajouter un Bulletin dans la base.")
+    @Operation(summary = "Cette opération permet d'ajouter un Bulletin dans la base (Directeur uniquement).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "L'opération d'ajout est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BulletinResponce.class))
             }),
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
+            @ApiResponse(responseCode = "403", description = "Accès refusé"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PostMapping("/add-Bulletin")
     public ResponseEntity<BulletinResponce> addBulletin(@Valid @RequestBody BulletinRequest bulletinRequest) {
         log.debug("add bulletin for etudiant ID: {}", bulletinRequest.getEtudiantId());
         return ResponseEntity.status(HttpStatus.CREATED).body(bulletinService.addBulletin(bulletinRequest));
     }
 
-    @Operation(summary = "Cette opération permet de récupérer tous les bulletins.")
+    @Operation(summary = "Cette opération permet de récupérer tous les bulletins (Directeur et Surveillant uniquement).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BulletinResponce.class))
-            })
+            }),
+            @ApiResponse(responseCode = "403", description = "Accès refusé")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @GetMapping("/getAllBulletins")
     public ResponseEntity<List<BulletinResponce>> getAllBulletins() {
         log.debug("getAllBulletins CONTROLLER");
@@ -58,21 +64,18 @@ public class BulletinController {
             @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BulletinResponce.class))
             }),
+            @ApiResponse(responseCode = "403", description = "Accès refusé"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
     @GetMapping("/getBulletinById/{idBulletin}")
     public ResponseEntity<BulletinResponce> getBulletinById(@PathVariable("idBulletin") Long idBulletin) {
         log.debug("getBulletinById CONTROLLER - ID: {}", idBulletin);
         return ResponseEntity.ok(bulletinService.getBulletinById(idBulletin));
     }
 
-    @Operation(summary = "Cette opération permet de modifier un Bulletin dans la base.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "L'opération est effectuée avec succès", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = BulletinResponce.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
-    })
+    @Operation(summary = "Cette opération permet de modifier un Bulletin dans la base (Directeur uniquement).")
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @PatchMapping("/update-Bulletin/{idBulletin}")
     public ResponseEntity<BulletinResponce> updateBulletin(@PathVariable("idBulletin") Long idBulletin,
                                                            @Valid @RequestBody BulletinRequest bulletinRequest) {
@@ -80,11 +83,8 @@ public class BulletinController {
         return ResponseEntity.ok(bulletinService.updateBulletin(idBulletin, bulletinRequest));
     }
 
-    @Operation(summary = "Cette opération permet de supprimer un Bulletin dans la base.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
-            @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
-    })
+    @Operation(summary = "Cette opération permet de supprimer un Bulletin dans la base (Directeur uniquement).")
+    @PreAuthorize("hasRole('DIRECTEUR')")
     @DeleteMapping("/delete-Bulletin/{idBulletin}")
     public ResponseEntity<Void> deleteBulletin(@PathVariable("idBulletin") Long idBulletin) {
         log.debug("Delete Bulletin : {}", idBulletin);
@@ -93,6 +93,7 @@ public class BulletinController {
     }
 
     @Operation(summary = "Générer et télécharger le bulletin officiel en format PDF pour un étudiant.")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT') or @securityService.isEtudiantSelf(#etudiantId)")
     @GetMapping(value = "/pdf/{etudiantId}", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateBulletinPdf(@PathVariable("etudiantId") Long etudiantId) {
         log.debug("generateBulletinPdf - Etudiant ID: {}", etudiantId);

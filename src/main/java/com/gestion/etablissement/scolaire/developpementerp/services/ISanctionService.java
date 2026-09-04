@@ -11,4 +11,5 @@ public interface ISanctionService {
     void deleteSanction(Long idSanction);
     List<SanctionResponce> getAllSanctions();
     SanctionResponce getSanctionById(Long idSanction);
+    List<SanctionResponce> getSanctionsByEtudiantEmail(String email);
 }

@@ -74,10 +74,14 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/login", "/login/**",
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
-                    // Swagger UI — pratique pour les tests, à restreindre en prod
+                    // Swagger UI
                     "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**"
                 ).permitAll()
-                // Tout autre endpoint nécessite une session authentifiée
+                // Defense-in-depth for sensitive user administration
+                .requestMatchers("/api-directeur/**", "/api-surveillant/**", "/api-responsable-financier/**", "/api-user/**")
+                    .hasRole("DIRECTEUR")
+                .requestMatchers("/api-profile/**").authenticated()
+                // Tout autre endpoint nécessite une session ou credentials authentifiés
                 .anyRequest().authenticated()
             )
 
@@ -111,22 +115,19 @@ public class SecurityConfig {
             )
 
             // ── CSRF ──────────────────────────────────────────────────────
-            // CSRF is ENABLED by default in Spring Security 6.
-            // Swagger/REST clients need to be aware; Thymeleaf forms include _csrf automatically.
-            /*.csrf(csrf -> csrf
-                .ignoringRequestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/api-user/**"
-                )
-            )*/
             .csrf(AbstractHttpConfigurer::disable)
+            // ── Exception Handling (REST JSON 401 & 403) ─────────────────
             .exceptionHandling(ex -> ex
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
-                    })
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"status\": 401, \"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"status\": 403, \"error\": \"Forbidden\", \"message\": \"Accès refusé : privilèges insuffisants.\"}");
+                })
             )
 
             // ── Authentication provider ───────────────────────────────────

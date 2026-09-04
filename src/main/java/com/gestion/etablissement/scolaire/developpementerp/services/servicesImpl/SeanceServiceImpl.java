@@ -74,6 +74,20 @@ public class SeanceServiceImpl implements ISeanceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<SeanceResponce> getSeancesForProfesseur(String email) {
+        log.debug("Fetching seances for professeur: {}", email);
+        return seanceMapper.mapList(seanceRepository.findByProfesseurEmail(email));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SeanceResponce> getSeancesForEtudiant(String email) {
+        log.debug("Fetching seances for etudiant: {}", email);
+        return seanceMapper.mapList(seanceRepository.findByEmploiDuTempsClasseEtudiantsEmail(email));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public SeanceResponce getSeanceById(Long idSeance) {
         log.debug("Fetching Seance ID: {}", idSeance);
         return seanceMapper.map(findSeanceOrThrow(idSeance));
@@ -100,7 +114,7 @@ public class SeanceServiceImpl implements ISeanceService {
 
         if (request.getProfesseurId() != null) {
             List<Seance> profConflicts = seanceRepository.findConflictingProfesseurSeances(
-                    request.getJour(), request.getProfesseurId(), request.getHeureDebut(), request.getHeureFin(), currentSeanceId
+                    request.getJour(), request.getProfesseurId(), request.getHeureDebut(), request.getHeureFin() , currentSeanceId
             );
             if (!profConflicts.isEmpty()) {
                 throw new BusinessException("Conflit d'emploi du temps : Le professeur a déjà un cours sur ce créneau le " + request.getJour());

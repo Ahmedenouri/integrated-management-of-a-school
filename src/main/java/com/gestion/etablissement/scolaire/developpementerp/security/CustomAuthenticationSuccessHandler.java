@@ -39,10 +39,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             String role = authority.getAuthority();
             return switch (role) {
                 case "ROLE_DIRECTEUR" -> "/api-dashboard/stats";
-                case "ROLE_RESPONSABLE_FINANCIER" -> "/api-paiement/getAllPaiements";
-                case "ROLE_SURVEILLANT" -> "/api-absence/getAllAbsences";
-                case "ROLE_PROFESSEUR" -> "/api-note/getAllNotes";
-                case "ROLE_ETUDIANT" -> "/api-note/getAllNotes";
+                case "ROLE_RESPONSABLE_FINANCIER" -> "/api-dashboard/financier";
+                case "ROLE_SURVEILLANT" -> "/api-dashboard/discipline";
+                case "ROLE_PROFESSEUR" -> "/api-seance/mes-seances";
+                case "ROLE_ETUDIANT" -> "/api-profile/me";
                 default -> "/login?error=role_inconnu";
             };
         }

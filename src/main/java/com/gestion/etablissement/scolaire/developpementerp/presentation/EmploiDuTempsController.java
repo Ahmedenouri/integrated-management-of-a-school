@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api-emploi-du-temps")
 @AllArgsConstructor
 @Slf4j
-@PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
+@PreAuthorize("isAuthenticated()")
 public class EmploiDuTempsController {
 
     private final IEmploiDuTempsService emploiDuTempsService;
@@ -35,6 +36,7 @@ public class EmploiDuTempsController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @PostMapping("/add-EmploiDuTemps")
     public ResponseEntity<EmploiDuTempsResponce> addEmploiDuTemps(@Valid @RequestBody EmploiDuTempsRequest request) {
         log.debug("add EmploiDuTemps for classe ID: {}", request.getClasseId());
@@ -47,10 +49,19 @@ public class EmploiDuTempsController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EmploiDuTempsResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @GetMapping("/getAllEmploisDuTemps")
     public ResponseEntity<List<EmploiDuTempsResponce>> getAllEmploisDuTemps() {
         log.debug("getAllEmploisDuTemps CONTROLLER");
         return ResponseEntity.ok(emploiDuTempsService.getAllEmploisDuTemps());
+    }
+
+    @Operation(summary = "Récupérer l'emploi du temps de l'étudiant connecté.")
+    @PreAuthorize("hasRole('ETUDIANT')")
+    @GetMapping("/mon-emploi")
+    public ResponseEntity<EmploiDuTempsResponce> getMonEmploi(Authentication authentication) {
+        log.debug("getMonEmploi for {}", authentication.getName());
+        return ResponseEntity.ok(emploiDuTempsService.getEmploiForEtudiant(authentication.getName()));
     }
 
     @Operation(summary = "Cette opération permet de récupérer un emploi du temps par son ID.")
@@ -60,6 +71,7 @@ public class EmploiDuTempsController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @GetMapping("/getEmploiDuTempsById/{id}")
     public ResponseEntity<EmploiDuTempsResponce> getEmploiDuTempsById(@PathVariable("id") Long id) {
         log.debug("getEmploiDuTempsById CONTROLLER - ID: {}", id);

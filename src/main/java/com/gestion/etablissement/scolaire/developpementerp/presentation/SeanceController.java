@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api-seance")
 @AllArgsConstructor
 @Slf4j
-@PreAuthorize("hasAnyRole('SURVEILLANT', 'PROFESSEUR', 'DIRECTEUR')")
+@PreAuthorize("isAuthenticated()")
 public class SeanceController {
 
     private final ISeanceService seanceService;
@@ -35,6 +36,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @PostMapping("/add-Seance")
     public ResponseEntity<SeanceResponce> addSeance(@Valid @RequestBody SeanceRequest request) {
         log.debug("add Seance for emploi ID: {}", request.getEmploiDuTempsId());
@@ -47,10 +49,25 @@ public class SeanceController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = SeanceResponce.class))
             })
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @GetMapping("/getAllSeances")
     public ResponseEntity<List<SeanceResponce>> getAllSeances() {
         log.debug("getAllSeances CONTROLLER");
         return ResponseEntity.ok(seanceService.getAllSeances());
+    }
+
+    @Operation(summary = "Récupérer les séances de cours de l'utilisateur connecté (Professeur ou Étudiant).")
+    @PreAuthorize("hasAnyRole('PROFESSEUR', 'ETUDIANT')")
+    @GetMapping("/mes-seances")
+    public ResponseEntity<List<SeanceResponce>> getMesSeances(Authentication authentication) {
+        log.debug("getMesSeances for {}", authentication.getName());
+        boolean isProf = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PROFESSEUR"));
+        if (isProf) {
+            return ResponseEntity.ok(seanceService.getSeancesForProfesseur(authentication.getName()));
+        } else {
+            return ResponseEntity.ok(seanceService.getSeancesForEtudiant(authentication.getName()));
+        }
     }
 
     @Operation(summary = "Cette opération permet de récupérer une séance par son ID.")
@@ -60,6 +77,7 @@ public class SeanceController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @GetMapping("/getSeanceById/{id}")
     public ResponseEntity<SeanceResponce> getSeanceById(@PathVariable("id") Long id) {
         log.debug("getSeanceById CONTROLLER - ID: {}", id);
@@ -73,6 +91,7 @@ public class SeanceController {
             }),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @PatchMapping("/update-Seance/{id}")
     public ResponseEntity<SeanceResponce> updateSeance(@PathVariable("id") Long id,
                                                        @Valid @RequestBody SeanceRequest request) {
@@ -85,6 +104,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "204", description = "L'opération est effectuée avec succès"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
+    @PreAuthorize("hasAnyRole('SURVEILLANT', 'DIRECTEUR')")
     @DeleteMapping("/delete-Seance/{id}")
     public ResponseEntity<Void> deleteSeance(@PathVariable("id") Long id) {
         log.debug("Delete Seance : {}", id);
