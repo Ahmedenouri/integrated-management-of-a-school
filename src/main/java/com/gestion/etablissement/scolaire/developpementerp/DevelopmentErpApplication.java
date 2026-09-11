@@ -21,7 +21,6 @@ public class DevelopmentErpApplication {
 		SpringApplication.run(DevelopmentErpApplication.class, args);
 	}
 
-    /**************************************************************************/
 
     @Bean
     CommandLineRunner initDatabase(

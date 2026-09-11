@@ -18,6 +18,9 @@ spring:
     swagger-ui:
       path: /swagger-ui.html
       enabled: true
+jwt:
+  secret: yourSecretKeyForJWTTokenGenerationMustBeAtLeast256BitsLongForSecurity
+  expiration: 86400000
 logging:
   level:
     org.springframework.web: DEBUG

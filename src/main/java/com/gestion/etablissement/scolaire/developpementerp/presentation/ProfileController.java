@@ -19,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api-profile")
 @AllArgsConstructor
@@ -63,10 +65,13 @@ public class ProfileController {
             @ApiResponse(responseCode = "401", description = "Non authentifié")
     })
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(Authentication authentication,
+    public ResponseEntity<Map<String, String>> changePassword(Authentication authentication,
                                                  @Valid @RequestBody ChangePasswordRequest request) {
         log.debug("POST /api-profile/change-password pour : {}", authentication.getName());
         profileService.changePassword(authentication.getName(), request);
-        return ResponseEntity.ok("Mot de passe mis à jour avec succès.");
+        return ResponseEntity.ok(Map.of(
+                "message", "Mot de passe mis à jour avec succès.",
+                "status", "success"
+        ));
     }
 }

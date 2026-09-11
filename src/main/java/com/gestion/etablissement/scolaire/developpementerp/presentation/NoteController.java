@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api-note")
@@ -95,18 +96,27 @@ public class NoteController {
     @Operation(summary = "Calculer la moyenne d'un étudiant pour une matière donnée.")
     @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT') or @securityService.isEtudiantSelf(#etudiantId) or @securityService.isProfesseurOfEtudiant(#etudiantId)")
     @GetMapping("/moyenne-matiere/{etudiantId}/{matiereId}")
-    public ResponseEntity<Double> calculateMoyenneMatiere(@PathVariable("etudiantId") Long etudiantId,
+    public ResponseEntity<Map<String, Object>> calculateMoyenneMatiere(@PathVariable("etudiantId") Long etudiantId,
                                                           @PathVariable("matiereId") Long matiereId) {
         log.debug("calculateMoyenneMatiere - Etudiant: {}, Matiere: {}", etudiantId, matiereId);
-        return ResponseEntity.ok(noteService.calculateMoyenneMatiere(etudiantId, matiereId));
+        Double moyenne = noteService.calculateMoyenneMatiere(etudiantId, matiereId);
+        return ResponseEntity.ok(Map.of(
+                "etudiantId", etudiantId,
+                "matiereId", matiereId,
+                "moyenne", moyenne
+        ));
     }
 
     @Operation(summary = "Calculer la moyenne générale d'un étudiant (pondérée par coefficients).")
     @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT') or @securityService.isEtudiantSelf(#etudiantId) or @securityService.isProfesseurOfEtudiant(#etudiantId)")
     @GetMapping("/moyenne-generale/{etudiantId}")
-    public ResponseEntity<Double> calculateMoyenneGenerale(@PathVariable("etudiantId") Long etudiantId) {
+    public ResponseEntity<Map<String, Object>> calculateMoyenneGenerale(@PathVariable("etudiantId") Long etudiantId) {
         log.debug("calculateMoyenneGenerale - Etudiant: {}", etudiantId);
-        return ResponseEntity.ok(noteService.calculateMoyenneGenerale(etudiantId));
+        Double moyenne = noteService.calculateMoyenneGenerale(etudiantId);
+        return ResponseEntity.ok(Map.of(
+                "etudiantId", etudiantId,
+                "moyenneGenerale", moyenne
+        ));
     }
 
     @Operation(summary = "Consulter ses propres notes (Espace Étudiant).")

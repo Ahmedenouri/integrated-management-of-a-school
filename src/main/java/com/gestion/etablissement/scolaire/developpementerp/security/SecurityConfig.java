@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +28,8 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
+    /** Injected from {@link CorsConfig#corsConfigurationSource()} — used by {@code .cors(Customizer.withDefaults())}. */
+    private final CorsConfigurationSource corsConfigurationSource;
 
     /**
      * BCrypt Password Encoder bean — used for encoding and verifying passwords.
@@ -68,14 +72,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // ── CORS ──────────────────────────────────────────────────────
+            // Picks up the CorsConfigurationSource bean defined in CorsConfig.
+            // Must be declared BEFORE authorizeHttpRequests so that the CORS
+            // filter runs first and OPTIONS preflight requests are handled
+            // before any authentication check takes place.
+            .cors(Customizer.withDefaults())
+
             // ── Authorization rules ──────────────────────────────────────
             .authorizeHttpRequests(auth -> auth
+                // Allow all CORS preflight (OPTIONS) requests without authentication
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Resources accessibles sans authentification
                 .requestMatchers(
                     "/login", "/login/**",
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     // Swagger UI
-                    "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**"
+                    "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**",
+                    // API Auth endpoints
+                    "/api/auth/**"
                 ).permitAll()
                 // Defense-in-depth for sensitive user administration
                 .requestMatchers("/api-directeur/**", "/api-surveillant/**", "/api-responsable-financier/**", "/api-user/**")
