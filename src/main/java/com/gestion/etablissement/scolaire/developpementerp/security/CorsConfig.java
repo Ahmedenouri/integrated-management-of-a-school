@@ -6,6 +6,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -53,9 +54,7 @@ public class CorsConfig {
         ));
 
         // ── Allowed HTTP methods ──────────────────────────────────────────
-        config.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         // ── Allowed request headers ───────────────────────────────────────
         config.setAllowedHeaders(List.of(
