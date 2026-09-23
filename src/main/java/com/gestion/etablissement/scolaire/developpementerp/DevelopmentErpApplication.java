@@ -52,7 +52,7 @@ public class DevelopmentErpApplication {
             Directeur directeur = new Directeur();
             directeur.setNom("Ennouri");
             directeur.setPrenom("Ahmed");
-            directeur.setEmail("ahmed.ennouri@school.ma");
+            directeur.setEmail("ahmed.ennouri@directeur.ma");
             directeur.setMotDePasse(passwordEncoder.encode("pass123"));
             directeur.setTelephone("0600000001");
             directeur.setRole(Role.DIRECTEUR);
@@ -63,7 +63,7 @@ public class DevelopmentErpApplication {
             ResponsableFinancier respFin = new ResponsableFinancier();
             respFin.setNom("Bennani");
             respFin.setPrenom("Karim");
-            respFin.setEmail("karim.bennani@school.ma");
+            respFin.setEmail("karim.bennani@responsableFinancier.ma");
             respFin.setMotDePasse(passwordEncoder.encode("pass123"));
             respFin.setTelephone("0600000002");
             respFin.setRole(Role.RESPONSABLE_FINANCIER);
@@ -74,7 +74,7 @@ public class DevelopmentErpApplication {
             Surveillant surveillant = new Surveillant();
             surveillant.setNom("Tazi");
             surveillant.setPrenom("Rachid");
-            surveillant.setEmail("rachid.tazi@school.ma");
+            surveillant.setEmail("rachid.tazi@surveillant.ma");
             surveillant.setMotDePasse(passwordEncoder.encode("pass123"));
             surveillant.setTelephone("0600000003");
             surveillant.setRole(Role.SURVEILLANT);
@@ -82,10 +82,11 @@ public class DevelopmentErpApplication {
             surveillant.setDateCreation(LocalDateTime.now());
             surveillantRepository.save(surveillant);
 
+            // Professeurs existants
             Professeur profMath = new Professeur();
             profMath.setNom("Chraibi");
             profMath.setPrenom("Hassan");
-            profMath.setEmail("hassan.chraibi@school.ma");
+            profMath.setEmail("hassan.chraibi@professeur.ma");
             profMath.setMotDePasse(passwordEncoder.encode("pass123"));
             profMath.setTelephone("0600000004");
             profMath.setRole(Role.PROFESSEUR);
@@ -96,7 +97,7 @@ public class DevelopmentErpApplication {
             Professeur profPhysique = new Professeur();
             profPhysique.setNom("El Fassi");
             profPhysique.setPrenom("Sanaa");
-            profPhysique.setEmail("sanaa.elfassi@school.ma");
+            profPhysique.setEmail("sanaa.elfassi@professeur.ma");
             profPhysique.setMotDePasse(passwordEncoder.encode("pass123"));
             profPhysique.setTelephone("0600000005");
             profPhysique.setRole(Role.PROFESSEUR);
@@ -104,7 +105,65 @@ public class DevelopmentErpApplication {
             profPhysique.setEstActif(true);
             profPhysique.setDateCreation(LocalDateTime.now());
 
-            professeurRepository.saveAll(List.of(profMath, profPhysique));
+            // Nouveaux Professeurs (Arabe, Français, SVT, Philosophie, Anglais)
+            Professeur profArabe = new Professeur();
+            profArabe.setNom("Naciri");
+            profArabe.setPrenom("Mohamed");
+            profArabe.setEmail("mohamed.naciri@professeur.ma");
+            profArabe.setMotDePasse(passwordEncoder.encode("pass123"));
+            profArabe.setTelephone("0600000006");
+            profArabe.setRole(Role.PROFESSEUR);
+            profArabe.setSpecialite("Langue Arabe");
+            profArabe.setEstActif(true);
+            profArabe.setDateCreation(LocalDateTime.now());
+
+            Professeur profFrancais = new Professeur();
+            profFrancais.setNom("Benjelloun");
+            profFrancais.setPrenom("Meriem");
+            profFrancais.setEmail("meriem.benjelloun@professeur.ma");
+            profFrancais.setMotDePasse(passwordEncoder.encode("pass123"));
+            profFrancais.setTelephone("0600000007");
+            profFrancais.setRole(Role.PROFESSEUR);
+            profFrancais.setSpecialite("Langue Française");
+            profFrancais.setEstActif(true);
+            profFrancais.setDateCreation(LocalDateTime.now());
+
+            Professeur profSvt = new Professeur();
+            profSvt.setNom("Daoudi");
+            profSvt.setPrenom("Youssef");
+            profSvt.setEmail("youssef.daoudi@professeur.ma");
+            profSvt.setMotDePasse(passwordEncoder.encode("pass123"));
+            profSvt.setTelephone("0600000008");
+            profSvt.setRole(Role.PROFESSEUR);
+            profSvt.setSpecialite("SVT");
+            profSvt.setEstActif(true);
+            profSvt.setDateCreation(LocalDateTime.now());
+
+            Professeur profPhilo = new Professeur();
+            profPhilo.setNom("Alami");
+            profPhilo.setPrenom("Mustapha");
+            profPhilo.setEmail("mustapha.alami@professeur.ma");
+            profPhilo.setMotDePasse(passwordEncoder.encode("pass123"));
+            profPhilo.setTelephone("0600000009");
+            profPhilo.setRole(Role.PROFESSEUR);
+            profPhilo.setSpecialite("Philosophie");
+            profPhilo.setEstActif(true);
+            profPhilo.setDateCreation(LocalDateTime.now());
+
+            Professeur profAnglais = new Professeur();
+            profAnglais.setNom("Kabbaj");
+            profAnglais.setPrenom("Laila");
+            profAnglais.setEmail("laila.kabbaj@professeur.ma");
+            profAnglais.setMotDePasse(passwordEncoder.encode("pass123"));
+            profAnglais.setTelephone("0600000010");
+            profAnglais.setRole(Role.PROFESSEUR);
+            profAnglais.setSpecialite("Langue Anglaise");
+            profAnglais.setEstActif(true);
+            profAnglais.setDateCreation(LocalDateTime.now());
+
+            professeurRepository.saveAll(List.of(
+                    profMath, profPhysique, profArabe, profFrancais, profSvt, profPhilo, profAnglais
+            ));
 
             // ==========================================================
             // 2. PEDAGOGIE (Classes, Matieres, Etudiants)
@@ -121,6 +180,7 @@ public class DevelopmentErpApplication {
 
             classeRepository.saveAll(List.of(classeBac, classeTronc));
 
+            // Matieres
             Matiere math = new Matiere();
             math.setCode("MATH2BAC");
             math.setIntitule("Mathématiques");
@@ -133,9 +193,39 @@ public class DevelopmentErpApplication {
             physique.setCoefficient(7.0);
             physique.setVolumeHoraire(100);
 
-            matiereRepository.saveAll(List.of(math, physique));
+            Matiere arabe = new Matiere();
+            arabe.setCode("ARA2BAC");
+            arabe.setIntitule("Langue Arabe");
+            arabe.setCoefficient(2.0);
+            arabe.setVolumeHoraire(40);
 
-            // Etudiants
+            Matiere francais = new Matiere();
+            francais.setCode("FRA2BAC");
+            francais.setIntitule("Langue Française");
+            francais.setCoefficient(4.0);
+            francais.setVolumeHoraire(60);
+
+            Matiere svt = new Matiere();
+            svt.setCode("SVT2BAC");
+            svt.setIntitule("Sciences de la Vie et de la Terre");
+            svt.setCoefficient(5.0);
+            svt.setVolumeHoraire(80);
+
+            Matiere philo = new Matiere();
+            philo.setCode("PHI2BAC");
+            philo.setIntitule("Philosophie");
+            philo.setCoefficient(2.0);
+            philo.setVolumeHoraire(40);
+
+            Matiere anglais = new Matiere();
+            anglais.setCode("ENG2BAC");
+            anglais.setIntitule("Langue Anglaise");
+            anglais.setCoefficient(2.0);
+            anglais.setVolumeHoraire(40);
+
+            matiereRepository.saveAll(List.of(math, physique, arabe, francais, svt, philo, anglais));
+
+            // Etudiants (3 existants + 6 nouveaux)
             Etudiant etudiant1 = new Etudiant();
             etudiant1.setNom("Alami");
             etudiant1.setPrenom("Youssef");
@@ -184,7 +274,106 @@ public class DevelopmentErpApplication {
             etudiant3.setEmailParent("nadia.mansouri@gmail.com");
             etudiant3.setClasse(classeTronc);
 
-            etudiantRepository.saveAll(List.of(etudiant1, etudiant2, etudiant3));
+            // 6 Nouveaux Étudiants
+            Etudiant etudiant4 = new Etudiant();
+            etudiant4.setNom("Idrissi");
+            etudiant4.setPrenom("Othmane");
+            etudiant4.setEmail("othmane.idrissi@student.ma");
+            etudiant4.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant4.setTelephone("0677777777");
+            etudiant4.setRole(Role.ETUDIANT);
+            etudiant4.setEstActif(true);
+            etudiant4.setDateCreation(LocalDateTime.now());
+            etudiant4.setCne("R131122334");
+            etudiant4.setDateNaissance(LocalDate.of(2007, 5, 18));
+            etudiant4.setNomParent("Hassan Idrissi");
+            etudiant4.setTelephoneParent("0677777778");
+            etudiant4.setEmailParent("hassan.idrissi@gmail.com");
+            etudiant4.setClasse(classeBac);
+
+            Etudiant etudiant5 = new Etudiant();
+            etudiant5.setNom("Tahiri");
+            etudiant5.setPrenom("Hiba");
+            etudiant5.setEmail("hiba.tahiri@student.ma");
+            etudiant5.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant5.setTelephone("0688888888");
+            etudiant5.setRole(Role.ETUDIANT);
+            etudiant5.setEstActif(true);
+            etudiant5.setDateCreation(LocalDateTime.now());
+            etudiant5.setCne("R132233445");
+            etudiant5.setDateNaissance(LocalDate.of(2007, 9, 30));
+            etudiant5.setNomParent("Amina Tahiri");
+            etudiant5.setTelephoneParent("0688888889");
+            etudiant5.setEmailParent("amina.tahiri@gmail.com");
+            etudiant5.setClasse(classeBac);
+
+            Etudiant etudiant6 = new Etudiant();
+            etudiant6.setNom("Fassi");
+            etudiant6.setPrenom("Hamza");
+            etudiant6.setEmail("hamza.fassi@student.ma");
+            etudiant6.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant6.setTelephone("0699999999");
+            etudiant6.setRole(Role.ETUDIANT);
+            etudiant6.setEstActif(true);
+            etudiant6.setDateCreation(LocalDateTime.now());
+            etudiant6.setCne("G143344556");
+            etudiant6.setDateNaissance(LocalDate.of(2008, 1, 12));
+            etudiant6.setNomParent("Tariq Fassi");
+            etudiant6.setTelephoneParent("0699999900");
+            etudiant6.setEmailParent("tariq.fassi@gmail.com");
+            etudiant6.setClasse(classeTronc);
+
+            Etudiant etudiant7 = new Etudiant();
+            etudiant7.setNom("Berrada");
+            etudiant7.setPrenom("Aya");
+            etudiant7.setEmail("aya.berrada@student.ma");
+            etudiant7.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant7.setTelephone("0612345678");
+            etudiant7.setRole(Role.ETUDIANT);
+            etudiant7.setEstActif(true);
+            etudiant7.setDateCreation(LocalDateTime.now());
+            etudiant7.setCne("G144455667");
+            etudiant7.setDateNaissance(LocalDate.of(2008, 4, 25));
+            etudiant7.setNomParent("Samir Berrada");
+            etudiant7.setTelephoneParent("0612345679");
+            etudiant7.setEmailParent("samir.berrada@gmail.com");
+            etudiant7.setClasse(classeTronc);
+
+            Etudiant etudiant8 = new Etudiant();
+            etudiant8.setNom("Chami");
+            etudiant8.setPrenom("Walid");
+            etudiant8.setEmail("walid.chami@student.ma");
+            etudiant8.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant8.setTelephone("0623456789");
+            etudiant8.setRole(Role.ETUDIANT);
+            etudiant8.setEstActif(true);
+            etudiant8.setDateCreation(LocalDateTime.now());
+            etudiant8.setCne("R135566778");
+            etudiant8.setDateNaissance(LocalDate.of(2007, 12, 8));
+            etudiant8.setNomParent("Karima Chami");
+            etudiant8.setTelephoneParent("0623456780");
+            etudiant8.setEmailParent("karima.chami@gmail.com");
+            etudiant8.setClasse(classeBac);
+
+            Etudiant etudiant9 = new Etudiant();
+            etudiant9.setNom("Ahmadi");
+            etudiant9.setPrenom("Khadija");
+            etudiant9.setEmail("khadija.ahmadi@student.ma");
+            etudiant9.setMotDePasse(passwordEncoder.encode("pass123"));
+            etudiant9.setTelephone("0634567890");
+            etudiant9.setRole(Role.ETUDIANT);
+            etudiant9.setEstActif(true);
+            etudiant9.setDateCreation(LocalDateTime.now());
+            etudiant9.setCne("G146677889");
+            etudiant9.setDateNaissance(LocalDate.of(2008, 8, 19));
+            etudiant9.setNomParent("Youssef Ahmadi");
+            etudiant9.setTelephoneParent("0634567891");
+            etudiant9.setEmailParent("youssef.ahmadi@gmail.com");
+            etudiant9.setClasse(classeTronc);
+
+            etudiantRepository.saveAll(List.of(
+                    etudiant1, etudiant2, etudiant3, etudiant4, etudiant5, etudiant6, etudiant7, etudiant8, etudiant9
+            ));
 
             // ==========================================================
             // 3. EVALUATIONS & NOTES & BULLETINS
@@ -350,6 +539,8 @@ public class DevelopmentErpApplication {
             recu1.setMontantPaye(2500.0);
             recu1.setPaiement(paiement1);
             recuRepository.save(recu1);
+
+
 
             System.out.println("✅ Les données d'initialisation de l'ERP ont été insérées avec succès !");
         };

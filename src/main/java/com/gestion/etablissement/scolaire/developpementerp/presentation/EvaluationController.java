@@ -35,7 +35,12 @@ public class EvaluationController {
             @ApiResponse(responseCode = "400", description = "La requête envoyée est incorrecte. Bad Request !"),
             @ApiResponse(responseCode = "500", description = "Erreur Server !")
     })
-    @PreAuthorize("hasRole('DIRECTEUR') or (hasRole('PROFESSEUR') and @securityService.canManageEvaluation(null, #request))")
+    //@PreAuthorize("hasRole('DIRECTEUR') or (hasRole('PROFESSEUR') and @securityService.canManageEvaluation(null, #request))")
+    @PreAuthorize("""
+    hasRole('DIRECTEUR') ||
+    (hasRole('PROFESSEUR') &&
+     @securityService.canManageEvaluation(null,#request))
+    """)
     @PostMapping("/add-Evaluation")
     public ResponseEntity<EvaluationResponce> addEvaluation(@Valid @RequestBody EvaluationRequest request) {
         log.debug("add Evaluation: {}", request.getTitre());

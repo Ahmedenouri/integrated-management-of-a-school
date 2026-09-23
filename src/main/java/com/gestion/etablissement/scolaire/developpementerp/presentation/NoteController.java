@@ -53,7 +53,7 @@ public class NoteController {
             }),
             @ApiResponse(responseCode = "403", description = "Accès refusé")
     })
-    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT')")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT','PROFESSEUR')")
     @GetMapping("/getAllNotes")
     public ResponseEntity<List<NoteResponce>> getAllNotes() {
         log.debug("getAllNotes CONTROLLER");
@@ -68,7 +68,7 @@ public class NoteController {
             @ApiResponse(responseCode = "403", description = "Accès refusé"),
             @ApiResponse(responseCode = "404", description = "La ressource demandée est introuvable. Not Found !")
     })
-    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT') or @securityService.isNoteViewer(#idNote)")
+    @PreAuthorize("hasAnyRole('DIRECTEUR', 'SURVEILLANT','PROFESSEUR') or @securityService.isNoteViewer(#idNote)")
     @GetMapping("/getNoteById/{idNote}")
     public ResponseEntity<NoteResponce> getNoteById(@PathVariable("idNote") Long idNote) {
         log.debug("getNoteById CONTROLLER - ID: {}", idNote);
